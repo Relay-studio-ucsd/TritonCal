@@ -1,0 +1,183 @@
+/**
+ * Raw TSS (SAP SLcM) OData shapes the parser consumes. Grounded in real captured
+ * responses — see docs/tss-recon/tss-api-notes.md.
+ */
+
+/** One row of YUCSD_I_PREREQ_TREE — a flat tree of enrollment requirements.
+ *  Roots (`parent_id: ""`) are AND-ed groups; children are OR alternatives.
+ *  The owning module is NOT in the rows — it's in the collection's @odata.context. */
+export interface TssPrereqRow {
+  id: string;
+  parent_id: string;
+  text: string;
+}
+
+/**
+ * One row of the `_sections` navigation response: a (Event × EventPackage) pair
+ * (DENORMALIZED).
+ *
+ * Which fields a row carries depends on the requesting page's `$select` — e.g. the
+ * 2026-08-10 live feed has `locationText` (lowercase) but no `EventKey` / `BeginDate` /
+ * `EndDate` / `LocationText`, while the 2026-07-21 fixtures are the other way around.
+ * Numeric-looking fields arrive as JSON NUMBERS in the live feed (2026-08-10) but as
+ * strings in older captures — declare both and normalize with `toNum`.
+ */
+export interface TssSectionRow {
+  AcYear: string;
+  AcPeriod: string;
+  ModuleID: string;
+  // Event (teaching component)
+  EventID: string;
+  EventKey?: string;
+  EventAbbr: string;              // "001-000-LE"
+  TeachingMethod: string;        // "LE"
+  TeachingMethod_Text: string;   // "Lecture"
+  InstructorName?: string;
+  InstructorEmail?: string;      // "mailto: LEPORTER@UCSD.EDU"
+  LocationText?: string;         // "UC San Diego" | "MC Online" (2026-07-21 captures)
+  locationText?: string;         // same content, lowercase key (2026-08-10 feed)
+  Status?: string;               // "Scheduled" | "Waitlist Only" | …
+  StatusSemantic?: number;       // 0 = Scheduled, 2 = Waitlist Only (observed 2026-08-10)
+  Limit?: string | number;
+  BeginDate?: string;            // ISO
+  EndDate?: string;
+  Sched: string;                 // the pre-formatted schedule string ⭐
+  // EventPackage (bookable option)
+  EventPkgOtjid: string;         // "SE00154302"
+  EventPkgObjid?: string;        // "154302" — Otjid without the SE prefix
+  EventPkgDisplayID?: string;
+  EventPkgText?: string;         // "CSE-008A (P-001-001)"
+  EventPkgLimit?: string | number;
+  EventPkgSeatsAvailable?: string | number;
+  EventPkgNumOnWaitl?: number;
+  EventPkgStatusText?: string;   // "" when simply full; "Waitlist Only" when waitlist-gated
+  EventPkgSemanticColorCapacity?: number; // 1 observed on fully-booked packages
+  EventPkgDisable?: string;      // "X" | "" — TSS greys its booking button on "X"
+}
+
+/** One row of the course-search list (`YUCSD_CON_MODULE`). */
+export interface TssModuleRow {
+  AcademicYear: string;
+  AcademicPeriod: string;
+  ModuleID: string;
+  AcademicLevel?: string;
+  DepartmentAbbr?: string;
+  DepartmentText?: string;
+  CourseAbbr: string;            // "CSE-008A"
+  CourseTitle: string;
+  CreditsDisplay?: string;
+  incrementDisplay?: string;
+}
+
+/** One row of ysd_appttimes `appointmentTimes` — an enrollment window. */
+export interface TssApptTimeRow {
+  timelimit: string;             // "9625"
+  timelimit_Text: string;        // "First Pass"
+  beginTimestamp: string;        // UTC ISO, e.g. "2026-08-10T21:00:00Z" (authoritative)
+  endTimestamp: string;
+  waitlists?: string;            // "Allowed" | "Not Allowed"
+  academicYear?: string;         // "2026"
+  academicYear_Text?: string;    // "2026/2027"
+  academicSession?: string;      // "2"
+  academicSession_Text?: string; // "Fall Quarter"
+}
+
+/** One row of ysd_appttimes `maxUnits` — unit cap by (session, window type). */
+export interface TssApptMaxUnitsRow {
+  Perid: string;     // academicSession code, e.g. "2"
+  Timelimit: string; // e.g. "9625"
+  MaxUnits: string;  // "11.50"
+}
+
+/** The single per-student `apptPeriods` row. The wire row ALSO carries PII
+ *  (studentNumber, studentObjid, studyObjid, programObjid) — deliberately NOT
+ *  declared here so no code path can read it; normalize whitelists fields. */
+export interface TssApptPeriodsRow {
+  academicYear: string;
+  academicSession: string;
+  appointmentTimes?: TssApptTimeRow[];
+  maxUnits?: TssApptMaxUnitsRow[];
+}
+
+/** One row of the homepage "Booked Courses" feed —
+ *  GET /sap/opu/odata/ited/BC_OVP_BOOKED_MODULES_SRV/ModuleSet.
+ *  ⚠ OData **v2**: the body is `{"d":{"results":[...]}}`, not an
+ *  `@odata.context` collection. Verified live 2026-08-11.
+ *
+ *  ⚠ **ENROLMENTS ONLY, and no status field of any kind.** Re-verified 2026-08-21 on a
+ *  student with 3 bookings + 2 waitlist places: the feed returned exactly the 3. A course
+ *  missing here is a course not BOOKED — it says nothing about queues, which is why a
+ *  capture of it may never clear the waitlist places `PR_MY_MODULES_V2_SRV` reported
+ *  (`CaptureStore.queuePlacesOutside`). */
+export interface TssBookedModuleRow {
+  /** OData v2 names the owning service in every row: `ITED.<SERVICE>.<Entity>`. The
+   *  only attribution a `$batch` part carries — its response headers don't repeat the
+   *  request URL, so this is how a row is traced back to the booked feed. */
+  __metadata?: { type?: string };
+  ModregId: string;            // booking-record GUID (entity key) — personal
+  SmShort: string;             // course code, e.g. "CHEM-114A"
+  SmStext?: string;            // course title
+  SmObjid: string;             // ZERO-PADDED module objid: "00002077" → ModuleID "2077"
+  AcademicYear: string;        // "2026"
+  AcademicSession: string;     // ZERO-PADDED session: "002" → period "2"
+  AcademicSessionText?: string;
+  AcademicYearText?: string;
+  Credits?: string;
+  CreditUnit?: string;
+  ConditionalBooking?: boolean; // semantics unverified — do not interpret
+}
+
+/**
+ * One row of the "My Courses" page —
+ * POST /sap/opu/odata/ITUS/PR_MY_MODULES_V2_SRV/$batch → ModuleHeaderSet.
+ * OData **v2**, inside a `$batch`. Verified live 2026-08-19.
+ *
+ * The richest of the three: course, term AND the booked package in one row, where the
+ * home page needs two feeds and a deduction to say the same thing. Reached from the
+ * home page's Booked Courses card (`#ZUSModule-display?TileType=MYMOD&…&/MyModules`),
+ * which is what the planner's "Check bookings" opens.
+ */
+export interface TssMyModuleRow {
+  __metadata?: { type?: string };
+  SmShort: string;           // "CHEM-114A"
+  SmObjid: string;           // ZERO-PADDED module objid
+  SmStext?: string;          // short title
+  SmDescription?: string;    // long title
+  AcademicYear: string;      // "2026"
+  AcademicSession: string;   // ZERO-PADDED: "002"
+  EventPackageAbbr: string;  // "P-002-004" — same string as SectionOption.code
+  EventPackageId?: string;   // "00152206" — SectionOption.id without its "SE" prefix
+  EventPackageName?: string; // "CHEM-114A (P-002-004)"
+  /** "01" = Booked, "00" = Waitlisted — both verified live 2026-08-21. Any OTHER value
+   *  is still UNVERIFIED, so a row carrying one is left alone rather than guessed at.
+   *  The parser reads the semantic fields below, not this code (see `myModuleRowToBooked`). */
+  SmStatus?: string;
+  SmStatusText?: string;     // "Booked" | "Waitlisted"
+  WaitlistBooking?: boolean; // true on a waitlist row, false on a booked one
+  /** Place in the queue (2 and 11 seen live); 0 on every booked row. Declared because
+   *  the wire carries it — the parser reads past it on purpose (see `BookedModule`). */
+  WaitlistPosition?: number;
+  Credits?: string;
+  CreditUnit?: string;
+}
+
+/**
+ * One row of the student's own timetable —
+ * GET /sap/opu/odata/ited/EVENT_TIMETABLE_SRV/EventListSet?$filter=(EventDate ge … le …).
+ * OData **v2**. Verified live 2026-08-19 (126 rows, one per dated occurrence).
+ *
+ * One row per DATE, so a weekly lecture appears ~10 times; we only ever read which
+ * events the student is in, never the dates. `EventId` is the plain objid of the same
+ * event our section captures call `EventID` — `Component.id` is "E " + this, verified
+ * on two of one student's courses (CHEM-114A 00001078, CHEM-152 00001085).
+ */
+export interface TssTimetableRow {
+  __metadata?: { type?: string };
+  EventId: string;         // "00001078" — Component.id without the "E " prefix
+  ModuleId: string;        // ZERO-PADDED: "00002077" → moduleId "2077"
+  EventDate: string;       // "/Date(1790208000000)/"
+  EventName?: string;      // "CHEM-114A-LE (002-000)" — course + method + section code
+  CourseName?: string;     // "Biochemical Structure&Function"
+  TeachingMethod?: string; // "Lecture" (display text, NOT the LE/DI/LA code)
+  EventIsExam?: boolean;   // exams are separate events, never part of a package
+}

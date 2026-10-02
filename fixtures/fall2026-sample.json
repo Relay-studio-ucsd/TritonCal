@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "timezone": "America/Los_Angeles",
+  "term": {
+    "label": "Fall 2026",
+    "instructionBegins": "2026-09-24",
+    "instructionEnds": "2026-12-04",
+    "finalsBegin": "2026-12-05",
+    "finalsEnd": "2026-12-12",
+    "holidays": ["2026-11-11", "2026-11-26", "2026-11-27"]
+  },
+  "courses": [
+    {
+      "code": "CSE-101",
+      "title": "Design and Analysis of Algorithms",
+      "units": 4,
+      "color": null,
+      "components": [
+        {
+          "type": "LE",
+          "section": "001-000",
+          "instructor": null,
+          "meetings": [
+            { "days": ["Mon", "Wed", "Fri"], "start": "13:00", "end": "13:50", "location": "Center Hall 115" }
+          ]
+        },
+        {
+          "type": "DI",
+          "section": "001-001",
+          "instructor": null,
+          "meetings": [
+            { "days": ["Fri"], "start": "17:00", "end": "17:50", "location": null }
+          ]
+        }
+      ],
+      "exams": [
+        { "kind": "final", "date": "2026-12-07", "start": "11:30", "end": "14:29", "location": null }
+      ]
+    },
+    {
+      "code": "CSE-151A",
+      "title": "Introduction to Machine Learning",
+      "units": 4,
+      "color": null,
+      "components": [
+        {
+          "type": "LE",
+          "section": "001-000",
+          "instructor": null,
+          "meetings": [
+            { "days": ["Tue", "Thu"], "start": "14:00", "end": "15:20", "location": null }
+          ]
+        },
+        {
+          "type": "DI",
+          "section": "001-001",
+          "instructor": null,
+          "meetings": [
+            { "days": ["Wed"], "start": "19:00", "end": "19:50", "location": null }
+          ]
+        }
+      ],
+      "exams": []
+    },
+    {
+      "code": "ANTH-021",
+      "title": "Race and Racisms",
+      "units": 4,
+      "color": null,
+      "components": [
+        {
+          "type": "LE",
+          "section": "001-000",
+          "instructor": null,
+          "meetings": [
+            { "days": ["Mon", "Wed", "Fri"], "start": "15:00", "end": "15:50", "location": null }
+          ]
+        },
+        {
+          "type": "DI",
+          "section": "001-004",
+          "instructor": null,
+          "meetings": [
+            { "days": ["Wed"], "start": "13:00", "end": "13:50", "location": null }
+          ]
+        }
+      ],
+      "exams": []
+    },
+    {
+      "code": "LIGN-008",
+      "title": "Languages and Cultures in America",
+      "units": 4,
+      "color": null,
+      "components": [
+        {
+          "type": "LE",
+          "section": "001-000",
+          "instructor": null,
+          "meetings": [
+            { "days": ["Tue", "Thu"], "start": "11:00", "end": "12:20", "location": null }
+          ]
+        }
+      ],
+      "exams": []
+    }
+  ],
+  "occurrences": null
+}

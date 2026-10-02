@@ -1,0 +1,10 @@
+# 真实抓取的 TSS 数据：含学号、booking GUID 等个人信息，永远不提交
+input/*
+!input/.gitkeep
+*.har
+
+# 生成物
+out/
+dist/
+node_modules/
+.DS_Store
