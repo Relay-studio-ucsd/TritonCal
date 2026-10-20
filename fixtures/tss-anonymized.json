@@ -1,0 +1,45 @@
+{
+  "d": {
+    "results": [
+      {
+        "__metadata": { "type": "ITED_EVENT_TIMETABLE_SRV.EventList" },
+        "EventId": "FAKE-EVENT-1",
+        "ModuleId": "FAKE-MODULE-1",
+        "EventDate": "/Date(1805068800000)/",
+        "StartTime": "PT08H00M00S",
+        "EndTime": "PT10H59M00S",
+        "EventName": "TEST-999-LE (001-000)",
+        "CourseName": "Example Seminar",
+        "Room": "",
+        "Location": "Example Campus",
+        "EventIsExam": true
+      },
+      {
+        "__metadata": { "type": "ITED_EVENT_TIMETABLE_SRV.EventList" },
+        "EventId": "FAKE-HOLIDAY",
+        "ModuleId": "",
+        "EventDate": "/Date(1805155200000)/",
+        "StartTime": "PT00H00M00S",
+        "EndTime": "PT00H00M00S",
+        "EventName": "Example holiday",
+        "CourseName": "",
+        "Room": "",
+        "Location": "",
+        "EventIsExam": false
+      },
+      {
+        "__metadata": { "type": "ITED_EVENT_TIMETABLE_SRV.EventList" },
+        "EventId": "FAKE-EVENT-2",
+        "ModuleId": "FAKE-MODULE-2",
+        "EventDate": "/Date(1805241600000)/",
+        "StartTime": "PT13H00M00S",
+        "EndTime": "PT13H50M00S",
+        "EventName": "TEST-888-DI (002-001)",
+        "CourseName": "Second Example",
+        "Room": "Example Room 1",
+        "Location": "Example Campus",
+        "EventIsExam": false
+      }
+    ]
+  }
+}

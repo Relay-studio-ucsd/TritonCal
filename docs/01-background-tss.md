@@ -36,7 +36,7 @@ SAPUI5 页面本身不含数据，页面加载后浏览器会向服务器请求 
 | 接口 | 格式 | 内容 | 状态 |
 |---|---|---|---|
 | `GET /sap/opu/odata/ited/BC_OVP_BOOKED_MODULES_SRV/ModuleSet` | OData **v2**：`{"d":{"results":[…]}}` | **已 book 的课**（一行一门课）。字段：`SmShort`="CSE-101"（课程代码）、`SmStext`（课名）、`SmObjid`（补零的 module id）、`AcademicYear`="2026"、`AcademicSession`="002"、`Credits`。只含已选上的，不含 waitlist，无状态字段 | ✅ 已验证 2026-08-11 / 08-21 |
-| `GET /sap/opu/odata/ited/EVENT_TIMETABLE_SRV/EventListSet?$filter=(EventDate ge datetime'…' and EventDate le datetime'…')` | OData **v2** | **学生自己的课表，一行 = 一次上课（按日期展开）**，一学期一百多行。已知字段：`EventId`、`ModuleId`、`EventDate`=`"/Date(1790208000000)/"`（毫秒 epoch，UTC 零点 → 2026-09-24）、`EventName`="CHEM-114A-LE (002-000)"、`CourseName`、`TeachingMethod`="Lecture"、`EventIsExam`（考试也是一行）。**这就是 TSS 首页 Upcoming Events 日历的数据源**；截图 1（苹果日历）里的事件标题 "CSE-101-LE (001-000)" 就是这个 `EventName` 格式 | ✅ 上述字段已验证 2026-08-19；⚠️ **开始/结束时间、教室字段待验证**（TritonPlan 只用了日期，没声明时间字段，但首页日历能画出 1:00–1:50，所以时间几乎一定在这行里，可能叫 `BeginTime`/`EndTime`/`StartTime`/`Room`/`Location` 之类，**抓一份看一眼就知道**） |
+| `GET /sap/opu/odata/ited/EVENT_TIMETABLE_SRV/EventListSet?$filter=(EventDate ge datetime'…' and EventDate le datetime'…')` | OData **v2** | **学生自己的课表，一行 = 一次上课（按日期展开）**。已验证字段：`EventId`、`ModuleId`、`EventDate`=`"/Date(1790208000000)/"`（毫秒 epoch，UTC 零点 → 2026-09-24）、`EventName`、`CourseName`、`TeachingMethod`、`EventIsExam`、`StartTime`/`EndTime`（`PT11H00M00S` 形式）、`Room`、`Location`、`Building`、`StartDate`/`EndDate` 等。**这就是 TSS 首页 Upcoming Events 日历的数据源。** | ✅ 2026-10-19 在用户正常登录、整页刷新后的真实响应再次验证；时间与教室字段已确认。`Room` 有时为空，`Location` 可能只写校园，`Building` 在这份响应中均为空，不能据此假设完整楼名一定存在。 |
 
 **注意**：只有**整页刷新**首页，TSS 才会重新拉这两个接口（SPA 内部跳转不会）。
 
@@ -73,9 +73,11 @@ Schedule Not Defined
 
 ## 4. 对本项目的结论
 
-1. **接口可行，朋友说得对。** 最省事的数据源是 3.1 的 `EventListSet`：已经按日期展开、已经扣掉了假期（假期那天没有行）、考试也在里面。只要它带时间和教室字段（待验证），一份响应就够画课表 + 出 ICS。
-2. 如果 `EventListSet` 没有教室，补一步：去 Schedule of Classes 搜每门课，拿 `_sections` 里的 `Sched`（带教室），用 `EventName` 里的 "001-000" 和 `EventAbbr` "001-000-LE" 对上。
-3. **先不写浏览器扩展。** 第一版让用户在 DevTools 里手动把响应另存为文件（`docs/02` 的方案 A），零代码、当天能跑；扩展/油猴脚本是后续的便利性优化（方案 B）。
+2026-10-20 补充验证：用户转述另一位同学安装后“可以用”，说明被动读取方案已在第二个学生账号基本运行。尚无该账号的字段原文或逐项核对结果，因此没有据此新增任何字段假设。
+
+1. **接口可行，时间字段也已验证。** 最省事的数据源是 3.1 的 `EventListSet`：已按日期展开，包含 `StartTime`、`EndTime`、`Room`。2026-10-19 的本地私有抓取有 156 行，其中 111 行有正时长，45 行是零时长的全天标记；有效课程在 2026-09-24 至 2026-12-10。11/11 和 11/26–27 没有有效课程。12/5 和 12/10 各有一条 179 分钟事件，但 `EventIsExam` 均为 `false`，因此不能仅凭该字段把它们标成考试。
+2. 这份响应有部分 `Room` 为空，且 `Building` 为空。若要补完整楼名或缺失教室，再去 Schedule of Classes 拿 `_sections.Sched`，用 `EventId` 对 `_sections.EventID`，或用课程代码与 section 对上。`Location` 不能直接当教室；它可能只表示校园。
+3. **当前已转向浏览器扩展。** 用户先用 DevTools 验证真实响应，随后明确希望直接在 TSS 官网试用类似插件的成果。当前 `extension/` 被动读取同一响应并在页面显示周课表；方案 A 仍可用于排错。
 4. 最坏情况（接口变了 / 抓不到）：手动按 `fixtures/` 的格式填一份 JSON（方案 C），渲染和 ICS 照常工作。渲染与 ICS **只依赖 `schedule.json`**，不依赖 TSS，这是架构上的保险。
 
 ## 5. 2026–27 学年关键日期（出处：blink.ucsd.edu 学术日历）

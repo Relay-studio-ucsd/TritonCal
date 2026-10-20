@@ -21,8 +21,8 @@
 7. **更省事的替代**：在请求列表任意处右键 → **Save all as HAR with content** → 存成 `input/tss.har`。HAR 是标准 JSON，解析器直接读里面每个 response 的 `content.text`。
 8. 如果课表响应里没有教室：打开 **Schedule of Classes**（`#YSchedule-view`），搜每一门已选的课并点进去看 sections，Network 里会出现 `_sections` 请求，响应另存为 `input/sections-<课程代码>.json`。
 
-**首次抓到后要做的验证（M3 的第一步）**：让用户把 `input/timetable.json` 里**任意一行**的字段名列出来（只要 key，不要值），贴给 AI；AI 据此更新 `docs/01` 的"待验证"项（时间字段、教室字段叫什么），然后再写解析器。
-已知每行一定有：`EventId, ModuleId, EventDate, EventName, CourseName, TeachingMethod, EventIsExam`。
+**真实抓取已于 2026-10-19 完成一次**：`EventListSet` 的时间字段是 `StartTime`、`EndTime`，教室相关字段是 `Room`、`Location`、`Building`；具体限制见 `docs/01`。后续仍应先核对新抓取的字段名，因为 TSS 可能更新。
+已验证每行含：`EventId, ModuleId, EventDate, EventName, CourseName, TeachingMethod, EventIsExam, StartTime, EndTime, Room, Location, Building`。
 
 ### 关于 `$batch` 响应的样子
 
@@ -44,7 +44,7 @@ Content-Type: application/json
 
 `"EventDate": "/Date(1790208000000)/"` → 取括号里的毫秒数 → `new Date(ms)` → 是 **UTC 零点**，表示那一天的日期。
 正确做法：`new Date(ms).toISOString().slice(0, 10)` 得到 `"2026-09-24"`。**不要**用本地时区转换，否则在美西会退到前一天晚上。
-时间字段（待验证）如果是 `"PT13H00M00S"` 这种 ISO 8601 duration（SAP OData v2 的 `Edm.Time` 常见写法），解析成 `13:00`。
+已验证时间字段是 `"PT13H00M00S"` 这种 ISO 8601 duration（SAP OData v2 的 `Edm.Time` 写法），解析成 `13:00`。
 
 ## 方案 B：浏览器脚本自动收集（便利性优化，M4 之后）
 
