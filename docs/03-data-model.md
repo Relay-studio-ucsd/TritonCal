@@ -68,7 +68,7 @@
 | `component.type` | `EventName` 里的 `-LE`/`-DI`（`TeachingMethod` 是 "Lecture" 这种文字，不要用它） | `TeachingMethod` |
 | `component.section` | `EventName` 括号里 | `EventAbbr` 去掉末尾 `-LE` |
 | `meeting.days/start/end` | 把同一 `EventId` 的所有日期按星期归并（见下） | 解析 `Sched` 行 |
-| `meeting.location` | ⚠️ 待验证字段 | `Sched` 行 `@` 之后 |
+| `meeting.location` | `Room` 优先；为空时保留 `null`，`Location` 可能只是校园名，不能当教室 | `Sched` 行 `@` 之后 |
 | `exams` | `EventIsExam === true` 的行 | `Sched` 里 `Final Examination …` 行 |
 | `occurrences` | 每行一条 | — |
 
