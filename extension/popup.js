@@ -11,7 +11,7 @@
         return;
       }
       tabId = tab.id;
-      status.textContent = "课表在 TSS 页面右下角的「本周课表」按钮里";
+      status.textContent = "课表在 TSS 页面右下角的「课表」按钮里";
       openButton.hidden = false;
     } catch {
       status.textContent = "无法读取此标签页。请在 TSS 首页刷新后重试。";

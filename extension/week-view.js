@@ -6,6 +6,20 @@
     ["#e4eff8", "#4a83ad"], ["#e8edf9", "#6a7fb1"], ["#e5f2ee", "#5a998b"],
     ["#f5ecdf", "#ae8a5c"], ["#f3e8ee", "#a57995"], ["#e9f0df", "#879d65"]
   ];
+  // UCSD 官方校历，2026-10-20 核对；仅用于划定日期，不修改 TSS 的考试标记。
+  // https://blink.ucsd.edu/instructors/resources/academic/calendars/2026.html
+  const terms = [
+    { start: "2026-09-21", finalsStart: "2026-12-05", end: "2026-12-12" },
+    { start: "2027-01-04", finalsStart: "2027-03-13", end: "2027-03-20" },
+    { start: "2027-03-24", finalsStart: "2027-06-05", end: "2027-06-11" }
+  ];
+
+  function finalSource(event) {
+    const term = terms.find(term => event.date >= term.start && event.date <= term.end);
+    if (term) return event.date >= term.finalsStart ? "calendar" : null;
+    // 未覆盖的学期不猜考试周，仅保留 TSS 明确标记的考试。
+    return event.isExam === true ? "exam-flag" : null;
+  }
 
   function minutes(time) {
     const [hours, mins] = time.split(":").map(Number);
@@ -52,6 +66,49 @@
     return { weekStart, weekEnd, days: placed, count: selected.length, startHour, endHour };
   }
 
+  // 以已读取日期覆盖的自然周估算学期长度，每个固定时段按不同日期计数。
+  function planTypicalWeek(events) {
+    const valid = events.filter(event => minutes(event.end) > minutes(event.start));
+    const dates = valid.map(event => event.date).sort();
+    const weeks = dates.length
+      ? Math.round((Date.parse(parser.mondayOf(dates.at(-1))) - Date.parse(parser.mondayOf(dates[0]))) / 604800000) + 1
+      : 0;
+    const threshold = Math.ceil(weeks / 2);
+    const groups = new Map();
+    for (const event of valid) {
+      if (event.isExam === true || finalSource(event) === "calendar") continue;
+      const weekday = (new Date(`${event.date}T00:00:00Z`).getUTCDay() + 6) % 7;
+      const key = JSON.stringify([event.code || event.name, event.type, event.section, weekday, event.start, event.end, event.room]);
+      if (!groups.has(key)) groups.set(key, { event, weekday, dates: new Set() });
+      groups.get(key).dates.add(event.date);
+    }
+    const regular = [...groups.values()].filter(group => group.dates.size >= threshold);
+    // 用内部锚点复用时间布局；典型周界面只显示星期，不展示锚点日期。
+    const anchor = "2026-01-05";
+    const plan = planWeek(regular.map(({ event, weekday }) => ({ ...event, date: parser.addDays(anchor, weekday) })), anchor);
+    return { ...plan, mode: "typical", weeks, threshold };
+  }
+
+  // 已知学期按官方期末周读取安排，避免 TSS 错误的 false 标记隐藏期末。
+  function planFinal(events) {
+    const exams = events.filter(event => finalSource(event) && minutes(event.end) > minutes(event.start));
+    const unmarkedCount = exams.filter(event => event.isExam !== true).length;
+    const unknownTermCount = exams.filter(event => finalSource(event) === "exam-flag").length;
+    const dates = exams.map(event => event.date).sort();
+    const firstDate = dates[0] || null;
+    const lastDate = dates.at(-1) || null;
+    const days = [];
+    if (firstDate) {
+      for (let date = firstDate; date <= lastDate; date = parser.addDays(date, 1)) {
+        days.push({ date, events: placeDay(exams.filter(event => event.date === date)) });
+      }
+    }
+    const times = days.flatMap(day => day.events);
+    const startHour = times.length ? Math.max(0, Math.floor(Math.min(...times.map(item => item.start)) / 60) - 1) : 8;
+    const endHour = times.length ? Math.min(24, Math.ceil(Math.max(...times.map(item => item.end)) / 60) + 1) : 18;
+    return { mode: "final", days, count: exams.length, unmarkedCount, unknownTermCount, firstDate, lastDate, startHour, endHour };
+  }
+
   function element(tag, text, className) {
     const node = document.createElement(tag);
     if (text != null) node.textContent = text;
@@ -66,9 +123,9 @@
     return colors[hash % colors.length];
   }
 
-  function dayLabel(date) {
+  function dayLabel(date, mode) {
     return new Intl.DateTimeFormat("zh-CN", {
-      timeZone: "UTC", weekday: "short", month: "numeric", day: "numeric"
+      timeZone: "UTC", weekday: "short", ...(mode === "final" ? { month: "numeric", day: "numeric" } : {})
     }).format(new Date(`${date}T12:00:00Z`));
   }
 
@@ -124,14 +181,14 @@
       .controls .swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px #26384a; }
       .custom-color { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #637486; }
       input[type="color"] { width: 28px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; }
+      .empty { padding: 24px; color: #637486; text-align: center; }
       @media (max-width: 650px) { .shell { inset: 0; border-radius: 0; } header { padding: 14px; } h1 { font-size: 19px; } .controls { gap: 6px; } .controls button { padding: 6px 8px; } }
     `);
     shadow.append(style);
     document.body.append(host);
     let events = [];
-    let weekStart = parser.mondayOf(parser.todayInTimezone());
+    let viewMode = "typical";
     let colorMode = "course";
-
     let monoColor = "#7893a9";
     const colorKey = "tritoncal:mono-color";
     try {
@@ -153,7 +210,7 @@
 
     function close() { host.style.display = "none"; shadow.replaceChildren(style); }
     function render(focusLabel = null, pixelsPerMinute = 1.7) {
-      const plan = planWeek(events, weekStart);
+      const plan = viewMode === "typical" ? planTypicalWeek(events) : planFinal(events);
       shadow.replaceChildren(style);
       const backdrop = element("div", null, "backdrop");
       backdrop.addEventListener("click", close);
@@ -166,7 +223,10 @@
       const header = element("header");
       const heading = element("div", null, "heading");
       const title = element("div");
-      title.append(element("h1", "周课表"), element("p", `${plan.weekStart} — ${plan.weekEnd} · ${plan.count} 条课程事件`, "range"));
+      const range = viewMode === "typical"
+        ? `每周 ${plan.count} 个常规时段 · 按已读取的 ${plan.weeks} 周归并`
+        : plan.count ? `${plan.firstDate} — ${plan.lastDate} · ${plan.count} 项安排` : "尚未读到期末安排";
+      title.append(element("h1", (viewMode === "typical" ? "典型周" : "Final")), element("p", range, "range"));
       const closeButton = element("button", "×", "close");
       closeButton.type = "button";
       closeButton.setAttribute("aria-label", "关闭周课表");
@@ -174,11 +234,12 @@
       heading.append(title, closeButton);
       header.append(heading);
       const controls = element("div", null, "controls");
-      for (const [label, delta] of [["← 上周", -7], ["本周", 0], ["下周 →", 7]]) {
-        const button = element("button", label);
+      for (const [label, mode] of [["典型周", "typical"], ["Final", "final"]]) {
+        const button = element("button", label, viewMode === mode ? "selected" : "");
         button.type = "button";
+        button.setAttribute("aria-pressed", String(viewMode === mode));
         button.addEventListener("click", () => {
-          weekStart = delta ? parser.addDays(weekStart, delta) : parser.mondayOf(parser.todayInTimezone());
+          viewMode = mode;
           render(label);
         });
         controls.append(button);
@@ -224,17 +285,18 @@
       offlineButton.disabled = events.length === 0;
       offlineButton.addEventListener("click", () => downloadOffline(events));
       controls.append(offlineButton);
-      const dates = events.map(event => event.date).sort();
-      const coverage = dates.length ? `；已读取范围 ${dates[0]}—${dates.at(-1)}` : "";
-      header.append(controls, element("p", `数据来自当前 TSS 标签页${coverage}；空教室不会用校园名代替。`, "note"));
+      header.append(controls, element("p", viewMode === "typical"
+        ? `同一时段至少出现 ${plan.threshold || 1} 周才列入典型周；请先让 TSS 加载完整学期。导出仍包含已读取的全部日期。`
+        : ["按 UCSD 官方期末周显示已读取安排（校历覆盖 2026 秋至 2027 春）。", plan.unmarkedCount ? `其中 ${plan.unmarkedCount} 项未被 TSS 标记为考试，请以课程详情的 Final Examination 为准。` : "", plan.unknownTermCount ? "另含未覆盖学期的 TSS 已标记考试，需在课程详情确认是否为期末。" : ""].filter(Boolean).join(" "), "note"));
       shell.append(header);
 
       const scroll = element("div", null, "scroll");
+      if (!plan.count) scroll.append(element("p", (viewMode === "typical" ? "没有符合频次条件的常规课程。" : "尚未读到期末周安排；这不代表没有考试。请在 TSS 课程详情核对 Final Examination，并让首页加载完整学期。"), "empty"));
       const grid = element("div", null, "grid");
       grid.style.gridTemplateColumns = `58px repeat(${plan.days.length}, minmax(150px, 1fr))`;
       grid.style.minWidth = `${58 + plan.days.length * 150}px`;
       grid.append(element("div", null, "corner"));
-      for (const day of plan.days) grid.append(element("div", dayLabel(day.date), "day-title"));
+      for (const day of plan.days) grid.append(element("div", dayLabel(day.date, viewMode), "day-title"));
       const height = (plan.endHour - plan.startHour) * 60 * pixelsPerMinute;
       const timeInset = 12;
       const hours = element("div", null, "hours");
@@ -265,8 +327,9 @@
           card.style.height = `${(item.end - item.start) * pixelsPerMinute - 4}px`;
           card.style.left = `calc(${item.column * 100 / item.columns}% + 2px)`;
           card.style.width = `calc(${100 / item.columns}% - 4px)`;
-          card.title = `${item.event.name} · ${item.event.title || "课名待确认"} · ${item.event.start}–${item.event.end} · ${item.event.room || "教室待确认"}`;
-          card.append(element("strong", `${item.event.code || item.event.name}${item.event.isExam ? " · 考试" : item.event.type ? ` · ${item.event.type}` : ""}`));
+          card.title = `${item.event.name || "未命名课程"} · ${item.event.title || "课名待确认"} · ${item.event.start}–${item.event.end} · ${item.event.room || "教室待确认"}`;
+          const kind = item.event.isExam === true ? "考试" : viewMode === "final" ? "期末周安排" : item.event.type;
+          card.append(element("strong", `${item.event.code || item.event.name || "未命名课程"}${kind ? ` · ${kind}` : ""}`));
           card.append(element("span", item.event.title || "课名待确认"));
           card.append(element("span", `${item.event.start}–${item.event.end}`));
           card.append(element("span", item.event.room || "教室待确认"));
@@ -275,7 +338,7 @@
         }
         grid.append(column);
       }
-      scroll.append(grid);
+      if (plan.days.length) scroll.append(grid);
       shell.append(scroll);
       // 按实际折行高度拉开时间轴，保证代码、课名、时间、教室都完整可见。
       const overflow = Math.max(1, ...cards.map(card => card.scrollHeight / Math.max(1, card.clientHeight)));
@@ -291,9 +354,8 @@
       if (event.key === "Escape" && host.style.display !== "none") close();
     });
     return {
-      open(nextEvents, date) {
+      open(nextEvents) {
         events = nextEvents;
-        weekStart = date;
         host.style.display = "block";
         render();
       },
@@ -304,5 +366,5 @@
     };
   }
 
-  globalThis.TritonCalWeekView = { planWeek, create };
+  globalThis.TritonCalWeekView = { planWeek, planTypicalWeek, planFinal, create };
 })();

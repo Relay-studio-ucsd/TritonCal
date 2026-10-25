@@ -4,9 +4,7 @@
   let panel = null;
   let panelBody = null;
   let toggle = null;
-  const parser = globalThis.TritonCalParser;
   let weekView = null;
-  let weekStart = parser.mondayOf(parser.todayInTimezone());
 
   function make(tag, text, className) {
     const element = document.createElement(tag);
@@ -18,49 +16,35 @@
   // 用页面内的小面板展示实验结果，方便 Arc 中直接验收。
   function renderPanel() {
     if (!panelBody || !toggle) return;
-    const sunday = parser.addDays(weekStart, 6);
-    const label = weekStart === parser.mondayOf(parser.todayInTimezone()) ? "本周课表" : "周课表";
     panelBody.replaceChildren();
-    panelBody.append(make("h2", label));
-    panelBody.append(make("p", `${weekStart} — ${sunday}`, "muted"));
-    const navigation = make("div", "", "nav");
-    for (const [label, delta] of [["← 上周", -7], ["本周", 0], ["下周 →", 7]]) {
-      const button = make("button", label);
-      button.type = "button";
-      button.addEventListener("click", () => {
-        weekStart = delta === 0 ? parser.mondayOf(parser.todayInTimezone()) : parser.addDays(weekStart, delta);
-        renderPanel();
-      });
-      navigation.append(button);
-    }
-    panelBody.append(navigation);
+    panelBody.append(make("h2", "课表"));
+    panelBody.append(make("p", `${"典型周"} · ${"Final"}`, "muted"));
     const openWeek = make("button", "打开周视图", "open-week");
     openWeek.type = "button";
     openWeek.disabled = !latest;
-    openWeek.addEventListener("click", () => weekView?.open(latest.events, weekStart));
+    openWeek.addEventListener("click", () => weekView?.open(latest.events));
     panelBody.append(openWeek);
     if (!latest) {
-      toggle.textContent = label;
+      toggle.textContent = "课表";
       panelBody.append(make("p", "等待 TSS 页面加载课表…"));
       return;
     }
-    const current = latest.events.filter(event => event.date >= weekStart && event.date <= sunday);
-    toggle.textContent = `${label} · ${current.length}`;
-    panelBody.append(make("p", `收到 ${latest.totalRows} 条记录，识别 ${latest.events.length} 次有效课程；数据仅保存在当前标签页内存中。`, "muted"));
-    if (!current.length) {
-      panelBody.append(make("p", "这一周没有已读取的课程。"));
+    const plan = globalThis.TritonCalWeekView.planTypicalWeek(latest.events);
+    toggle.textContent = `课表 · ${plan.count}`;
+    panelBody.append(make("p", `典型周 ${plan.count} 个时段；已读取 ${latest.events.length} 次课程。`, "muted"));
+    if (!plan.count) {
+      panelBody.append(make("p", "没有符合频次条件的常规课程，可打开周视图查看 Final。"));
       return;
     }
-    let previousDate = "";
-    for (const event of current) {
-      if (event.date !== previousDate) {
-        panelBody.append(make("h3", event.date));
-        previousDate = event.date;
+    for (const day of plan.days) {
+      if (!day.events.length) continue;
+      panelBody.append(make("h3", new Intl.DateTimeFormat("zh-CN", { timeZone: "UTC", weekday: "short" }).format(new Date(`${day.date}T12:00:00Z`))));
+      for (const { event } of day.events) {
+        const card = make("div", "", "card");
+        card.append(make("strong", event.name || "未命名课程"));
+        card.append(make("span", `${event.start}–${event.end} · ${event.room || "教室待确认"}`));
+        panelBody.append(card);
       }
-      const card = make("div", "", "card");
-      card.append(make("strong", event.name));
-      card.append(make("span", `${event.start}–${event.end} · ${event.room || "教室待确认"}`));
-      panelBody.append(card);
     }
   }
 
@@ -78,12 +62,11 @@
       .panel.open { display: block; }
       h2 { font-size: 18px; margin: 0 0 2px; } h3 { font-size: 13px; margin: 14px 0 5px; color: #426079; }
       p { margin: 4px 0 12px; } .muted { color: #62788a; font-size: 12px; }
-      .nav { display: flex; gap: 6px; margin: 10px 0; } .nav button { background: #eef5fa; border: 1px solid #cadbe9; border-radius: 6px; color: #17324d; padding: 4px 8px; }
       .open-week { width: 100%; background: #1468a0; border: 0; border-radius: 7px; color: white; font-weight: 650; padding: 8px; margin: 0 0 12px; } .open-week:disabled { opacity: .5; cursor: default; }
       .card { border-top: 1px solid #e4edf3; padding: 8px 0; } .card strong, .card span { display: block; }
       .card span { color: #526a7f; font-size: 12px; margin-top: 2px; }
     `);
-    toggle = make("button", "本周课表", "toggle");
+    toggle = make("button", "课表", "toggle");
     toggle.type = "button";
     toggle.setAttribute("aria-expanded", "false");
     panel = make("div", "", "panel");
@@ -124,7 +107,7 @@
         sendResponse({ waiting: true });
         return;
       }
-      weekView.open(latest.events, weekStart);
+      weekView.open(latest.events);
       sendResponse({ opened: true });
       return;
     }
