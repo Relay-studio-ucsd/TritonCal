@@ -14,7 +14,7 @@
 
 ## 当前发布状态
 
-当前版本 **0.6.0**，正在完成 PR 合并后发布。下载入口：[GitHub Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases)。本页在发布成功后更新为实际 Release 链接。
+开发分支版本 **0.6.0**，已创建 [PR #6](https://github.com/Relay-studio-ucsd/TritonCal/pull/6)。仓库要求至少一位有写入权限的人批准，当前合并被阻止；`main` 尚未升级、Release 尚未发布。批准合并后须从 `main` 重新运行测试和打包，再发布。预定下载入口：[GitHub Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases)。本页在发布成功后更新为实际 Release 链接。
 
 仅上传 `tritoncal-extension-preview-0.6.0.zip`，解压后得到 `extension` 文件夹。ZIP 有 21 个白名单文件，比最初 16 个多了 5 个双语文件；不含 `input/`、`out/`、测试或个人数据。商店候选 ZIP 只作本地准备，不上传 Release，ZIP 不提交源码仓库。
 
