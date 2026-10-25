@@ -188,21 +188,22 @@
       grid.append(element("div", null, "corner"));
       for (const day of plan.days) grid.append(element("div", dayLabel(day.date), "day-title"));
       const height = (plan.endHour - plan.startHour) * 60 * pixelsPerMinute;
+      const timeInset = 12;
       const hours = element("div", null, "hours");
-      hours.style.height = `${height}px`;
+      hours.style.height = `${height + timeInset * 2}px`;
       for (let hour = plan.startHour; hour <= plan.endHour; hour++) {
         const label = element("span", `${String(hour).padStart(2, "0")}:00`, "hour-label");
-        label.style.top = `${(hour - plan.startHour) * 60 * pixelsPerMinute}px`;
+        label.style.top = `${timeInset + (hour - plan.startHour) * 60 * pixelsPerMinute}px`;
         hours.append(label);
       }
       grid.append(hours);
       const cards = [];
       for (const day of plan.days) {
         const column = element("div", null, "day");
-        column.style.height = `${height}px`;
+        column.style.height = `${height + timeInset * 2}px`;
         for (let hour = plan.startHour; hour <= plan.endHour; hour++) {
           const rule = element("div", null, "rule");
-          rule.style.top = `${(hour - plan.startHour) * 60 * pixelsPerMinute}px`;
+          rule.style.top = `${timeInset + (hour - plan.startHour) * 60 * pixelsPerMinute}px`;
           column.append(rule);
         }
         for (const item of day.events) {
@@ -212,7 +213,7 @@
             : item.event.isExam ? ["#fff0df", "#b97831"] : courseColor(item.event);
           card.style.background = background;
           card.style.borderColor = border;
-          card.style.top = `${(item.start - plan.startHour * 60) * pixelsPerMinute + 2}px`;
+          card.style.top = `${timeInset + (item.start - plan.startHour * 60) * pixelsPerMinute + 2}px`;
           card.style.height = `${(item.end - item.start) * pixelsPerMinute - 4}px`;
           card.style.left = `calc(${item.column * 100 / item.columns}% + 2px)`;
           card.style.width = `calc(${100 / item.columns}% - 4px)`;
