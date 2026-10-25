@@ -119,6 +119,11 @@
       .event { position: absolute; overflow: hidden; padding: 5px 6px; border-left: 3px solid; border-radius: 6px; font-size: 10px; line-height: 1.2; overflow-wrap: anywhere; }
       .event strong, .event span { display: block; white-space: normal; }
       .event strong { font-size: 11px; } .event span { margin-top: 2px; }
+      .palette { display: flex; align-items: center; gap: 8px; }
+      .controls .swatch { padding: 0; width: 24px; height: 24px; border: 3px solid white; border-radius: 50%; background: var(--swatch); box-shadow: 0 0 0 1px #d7e0e8; }
+      .controls .swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px #26384a; }
+      .custom-color { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #637486; }
+      input[type="color"] { width: 28px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; }
       @media (max-width: 650px) { .shell { inset: 0; border-radius: 0; } header { padding: 14px; } h1 { font-size: 19px; } .controls { gap: 6px; } .controls button { padding: 6px 8px; } }
     `);
     shadow.append(style);
@@ -126,6 +131,25 @@
     let events = [];
     let weekStart = parser.mondayOf(parser.todayInTimezone());
     let colorMode = "course";
+
+    let monoColor = "#7893a9";
+    const colorKey = "tritoncal:mono-color";
+    try {
+      const saved = localStorage.getItem(colorKey);
+      if (/^#[0-9a-f]{6}$/i.test(saved)) monoColor = saved.toLowerCase();
+    } catch { /* 禁用存储时仍可正常选色。 */ }
+
+    function setMonoColor(color) {
+      monoColor = color;
+      try { localStorage.setItem(colorKey, color); } catch { /* 存储不可用时仅保留本次选择。 */ }
+      shadow.querySelectorAll(".swatch").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.color === color)));
+      if (colorMode === "mono") {
+        shadow.querySelectorAll(".event").forEach(card => {
+          card.style.borderColor = color;
+          card.style.background = `${color}18`;
+        });
+      }
+    }
 
     function close() { host.style.display = "none"; shadow.replaceChildren(style); }
     function render(focusLabel = null, pixelsPerMinute = 1.7) {
@@ -159,6 +183,29 @@
         });
         controls.append(button);
       }
+      const palette = element("div", null, "palette");
+      palette.setAttribute("role", "group");
+      palette.setAttribute("aria-label", "单色颜色");
+      for (const [key, color] of [["雾蓝", "#7893a9"], ["海蓝", "#4a83ad"], ["藤紫", "#8c80ac"], ["鼠尾草", "#679889"], ["橄榄", "#879d65"], ["沙金", "#ae8a5c"], ["玫瑰", "#a57995"]]) {
+        const name = key;
+        const swatch = element("button", null, "swatch");
+        swatch.type = "button";
+        swatch.dataset.color = color;
+        swatch.style.setProperty("--swatch", color);
+        swatch.title = name;
+        swatch.setAttribute("aria-label", `单色：${name}`);
+        swatch.setAttribute("aria-pressed", String(monoColor === color));
+        swatch.addEventListener("click", () => { setMonoColor(color); customInput.value = color; });
+        palette.append(swatch);
+      }
+      const customLabel = element("label", "自定义", "custom-color");
+      const customInput = element("input");
+      customInput.type = "color";
+      customInput.value = monoColor;
+      customInput.setAttribute("aria-label", "自定义单色");
+      customInput.addEventListener("input", () => setMonoColor(customInput.value));
+      customLabel.append(customInput);
+      palette.append(customLabel);
       for (const [label, mode] of [["按课上色", "course"], ["单色", "mono"]]) {
         const button = element("button", label, colorMode === mode ? "selected" : "");
         button.type = "button";
@@ -166,6 +213,7 @@
         button.addEventListener("click", () => { colorMode = mode; render(label); });
         controls.append(button);
       }
+      if (colorMode === "mono") controls.append(palette);
       const exportButton = element("button", `导出已读取课程 (.ics · ${events.length} 条)`);
       exportButton.type = "button";
       exportButton.disabled = events.length === 0;
@@ -209,7 +257,7 @@
         for (const item of day.events) {
           const card = element("div", null, "event");
           const [background, border] = colorMode === "mono"
-            ? ["#f1f4f6", "#7893a9"]
+            ? [`${monoColor}18`, monoColor]
             : item.event.isExam ? ["#fff0df", "#b97831"] : courseColor(item.event);
           card.style.background = background;
           card.style.borderColor = border;
