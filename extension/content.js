@@ -119,6 +119,15 @@
   });
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message?.type === "tritoncal:open-week-view") {
+      if (!latest || !weekView) {
+        sendResponse({ waiting: true });
+        return;
+      }
+      weekView.open(latest.events, weekStart);
+      sendResponse({ opened: true });
+      return;
+    }
     if (message?.type !== "tritoncal:get-timetable") return;
     sendResponse(latest ?? { waiting: true });
   });
