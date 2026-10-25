@@ -2,6 +2,7 @@
   const channel = "tritoncal:timetable:v1";
   let latest = null;
   let panel = null;
+  let panelBody = null;
   let toggle = null;
   const parser = globalThis.TritonCalParser;
   let weekView = null;
@@ -16,12 +17,12 @@
 
   // 用页面内的小面板展示实验结果，方便 Arc 中直接验收。
   function renderPanel() {
-    if (!panel || !toggle) return;
+    if (!panelBody || !toggle) return;
     const sunday = parser.addDays(weekStart, 6);
     const label = weekStart === parser.mondayOf(parser.todayInTimezone()) ? "本周课表" : "周课表";
-    panel.replaceChildren();
-    panel.append(make("h2", label));
-    panel.append(make("p", `${weekStart} — ${sunday}`, "muted"));
+    panelBody.replaceChildren();
+    panelBody.append(make("h2", label));
+    panelBody.append(make("p", `${weekStart} — ${sunday}`, "muted"));
     const navigation = make("div", "", "nav");
     for (const [label, delta] of [["← 上周", -7], ["本周", 0], ["下周 →", 7]]) {
       const button = make("button", label);
@@ -32,34 +33,34 @@
       });
       navigation.append(button);
     }
-    panel.append(navigation);
+    panelBody.append(navigation);
     const openWeek = make("button", "打开周视图", "open-week");
     openWeek.type = "button";
     openWeek.disabled = !latest;
     openWeek.addEventListener("click", () => weekView?.open(latest.events, weekStart));
-    panel.append(openWeek);
+    panelBody.append(openWeek);
     if (!latest) {
       toggle.textContent = label;
-      panel.append(make("p", "等待 TSS 页面加载课表…"));
+      panelBody.append(make("p", "等待 TSS 页面加载课表…"));
       return;
     }
     const current = latest.events.filter(event => event.date >= weekStart && event.date <= sunday);
     toggle.textContent = `${label} · ${current.length}`;
-    panel.append(make("p", `收到 ${latest.totalRows} 条记录，识别 ${latest.events.length} 次有效课程；数据仅保存在当前标签页内存中。`, "muted"));
+    panelBody.append(make("p", `收到 ${latest.totalRows} 条记录，识别 ${latest.events.length} 次有效课程；数据仅保存在当前标签页内存中。`, "muted"));
     if (!current.length) {
-      panel.append(make("p", "这一周没有已读取的课程。"));
+      panelBody.append(make("p", "这一周没有已读取的课程。"));
       return;
     }
     let previousDate = "";
     for (const event of current) {
       if (event.date !== previousDate) {
-        panel.append(make("h3", event.date));
+        panelBody.append(make("h3", event.date));
         previousDate = event.date;
       }
       const card = make("div", "", "card");
       card.append(make("strong", event.name));
       card.append(make("span", `${event.start}–${event.end} · ${event.room || "教室待确认"}`));
-      panel.append(card);
+      panelBody.append(card);
     }
   }
 
@@ -72,7 +73,8 @@
       :host { all: initial; position: fixed; right: 20px; bottom: 20px; z-index: 2147483647; font: 14px/1.45 system-ui, sans-serif; color: #17324d; }
       button { cursor: pointer; font: inherit; }
       .toggle { background: #1468a0; border: 0; border-radius: 999px; color: white; font-weight: 700; padding: 11px 16px; box-shadow: 0 3px 14px #0003; }
-      .panel { display: none; position: absolute; right: 0; bottom: 50px; width: min(360px, calc(100vw - 40px)); max-height: min(540px, calc(100vh - 100px)); overflow: auto; box-sizing: border-box; padding: 16px; background: white; border: 1px solid #cadbe9; border-radius: 12px; box-shadow: 0 10px 32px #0003; }
+      .panel { display: none; position: absolute; right: 0; bottom: 50px; width: min(360px, calc(100vw - 40px)); overflow: hidden; box-sizing: border-box; background: white; border: 1px solid #cadbe9; border-radius: 12px; box-shadow: 0 10px 32px #0003; }
+      .panel-body { max-height: min(540px, calc(100vh - 102px)); overflow: auto; scrollbar-width: thin; box-sizing: border-box; padding: 16px; }
       .panel.open { display: block; }
       h2 { font-size: 18px; margin: 0 0 2px; } h3 { font-size: 13px; margin: 14px 0 5px; color: #426079; }
       p { margin: 4px 0 12px; } .muted { color: #62788a; font-size: 12px; }
@@ -85,6 +87,8 @@
     toggle.type = "button";
     toggle.setAttribute("aria-expanded", "false");
     panel = make("div", "", "panel");
+    panelBody = make("div", "", "panel-body");
+    panel.append(panelBody);
     toggle.addEventListener("click", () => {
       const open = panel.classList.toggle("open");
       toggle.setAttribute("aria-expanded", String(open));
