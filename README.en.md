@@ -4,11 +4,16 @@
 
 TritonCal is an independent student project, not affiliated with or endorsed by UC San Diego. It displays classes already loaded by the TSS home page in a weekly timetable and exports calendar (.ics) or standalone offline HTML files.
 
-Local preview version: **0.5.5**. These changes have not yet been merged into GitHub or published to an extension store.
+Current preview version: **0.6.0**. Download from [GitHub Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases). Chrome Web Store publication is deferred because developer registration requires a fee.
 
 ## Install
 
-No programming tools are needed. See the [English installation guide](extension/README.en.md). Extract the preview ZIP, open your browser's extensions page, enable Developer mode, and load the `extension` folder containing `manifest.json`. Sign in to TSS yourself and refresh its home page.
+No programming tools are needed. Full [English installation guide](extension/README.en.md).
+
+1. Download `tritoncal-extension-preview-0.6.0.zip` from [Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases).
+2. Extract the ZIP to get the `extension` folder.
+3. Open `chrome://extensions`, enable **Developer mode**, choose **Load unpacked**, and select `extension` (containing `manifest.json`).
+4. Sign in to TSS yourself and refresh its home page. Click the bottom-right schedule button, then **Open week view**. First use defaults to Chinese; click **English** to switch.
 
 ## Features and language
 
@@ -27,6 +32,15 @@ Incomplete TSS data means an incomplete timetable. Typical-week slots must occur
 Desktop use is the current focus. Windows appearance and phone compatibility still need device testing. Exported files are snapshots, not automatic updates.
 
 ## Development
+
+Clone the repository for development:
+
+```sh
+git clone https://github.com/Relay-studio-ucsd/TritonCal.git
+cd TritonCal
+npm test
+npm run package
+```
 
 Use Node.js 20 or newer. `npm test` runs the root tests; `npm run package` creates preview and store-candidate ZIPs using an explicit allowlist. There are no runtime npm dependencies. The optional `scripts/check-ui.cjs` regression harness uses an externally installed Playwright and Chrome with synthetic data in both languages; it never opens TSS.
 

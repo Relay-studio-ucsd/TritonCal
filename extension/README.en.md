@@ -1,4 +1,4 @@
-# TritonCal 0.5.5 — installation guide
+# TritonCal 0.6.0 — installation guide
 
 [简体中文](README.md)
 
@@ -6,7 +6,7 @@ TritonCal displays a typical week and finals-period events from the schedule alr
 
 ## Load the extension
 
-1. Extract `tritoncal-extension-preview-0.5.5.zip` and keep the resulting folder.
+1. Download `tritoncal-extension-preview-0.6.0.zip` from [GitHub Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases), then extract it to get the `extension` folder.
 2. Open `chrome://extensions` in Chrome or `arc://extensions` in Arc.
 3. Turn on **Developer mode**.
 4. Choose **Load unpacked** and select the `extension` folder. The selected folder must directly contain `manifest.json`.

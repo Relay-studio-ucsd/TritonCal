@@ -2,7 +2,7 @@
 
 [English installation guide](README.en.md)
 
-这是从 TSS 真实响应读取课程的浏览器插件预览版 0.5.5。TSS 页面右下角会出现“课表”按钮；点开后可进入按时间排列的周视图，切换“典型周 / Final”与颜色模式，并下载 `.ics` 日历文件或离线课表网页。当前主要支持电脑端；这是独立学生项目，与 UC San Diego 官方没有隶属关系。
+这是从 TSS 真实响应读取课程的浏览器插件预览版 0.6.0。TSS 页面右下角会出现“课表”按钮；点开后可进入按时间排列的周视图，切换“典型周 / Final”与颜色模式，并下载 `.ics` 日历文件或离线课表网页。当前主要支持电脑端；这是独立学生项目，与 UC San Diego 官方没有隶属关系。
 
 ## 中英双语
 
@@ -16,7 +16,7 @@
 
 ## 手动加载
 
-1. 在电脑上解压 `tritoncal-extension-preview-0.5.5.zip`，保留解压出来的文件夹。
+1. 到本仓库 [Releases 页面](https://github.com/Relay-studio-ucsd/TritonCal/releases) 下载 `tritoncal-extension-preview-0.6.0.zip`，解压后得到 `extension` 文件夹。
 2. 打开 Arc 或 Chrome，在地址栏输入 `chrome://extensions` 并回车。Arc 也可以输入 `arc://extensions`。
 3. 打开页面右上角的 **开发者模式 / Developer mode**。
 4. 点击 **加载已解压的扩展程序 / Load unpacked**，选择解压出来的 `extension` 文件夹。选中的文件夹里面应直接有 `manifest.json`。
@@ -29,9 +29,9 @@
 
 **给别人试用时只分享 `extension/` 目录或预览版 ZIP**，不要分享项目的 `input/` 目录；后者可能含个人课表和学号。对方需要用自己的账号登录 TSS，并在自己的浏览器按上面的步骤手动加载。当前尚未上架扩展商店。2026-10-20 已收到第二个账号可以使用的反馈，特殊课程情况仍需逐项核对。
 
-本机生成的 `out/tritoncal-extension-preview-0.5.5.zip` 只有插件代码、语言包、图标与说明，没有真实抓取数据。完整的数据处理说明见 [PRIVACY.md](PRIVACY.md)。
+Release 提供的 `tritoncal-extension-preview-0.6.0.zip` 只有插件代码、语言包、图标与说明，没有真实抓取数据。完整的数据处理说明见 [PRIVACY.md](PRIVACY.md)。
 
-历史实测：用户在 Arc 的 TSS 官网确认入口及真实课程，并在 0.5.3 刷新后确认 Final 能显示两门考试。0.5.5 已通过中英 Chrome 假数据界面检查；Windows 真机外观仍待确认。
+历史实测：用户在 Arc 的 TSS 官网确认入口及真实课程，并在 0.5.3 刷新后确认 Final 能显示两门考试。0.6.0 已通过中英 Chrome 假数据界面检查；Windows 真机外观仍待确认。
 
 ## 帮忙试用时检查什么
 
