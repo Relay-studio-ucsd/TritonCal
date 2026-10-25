@@ -19,7 +19,7 @@ test("第二学期的脱敏响应能完整走通解析、周视图和导出", ()
   assert.equal(plan.days.length, 5);
   const calendar = context.TritonCalIcs.generateCalendar(parsed.events, { now: new Date("2026-10-20T12:00:00Z") });
   assert.equal((calendar.match(/BEGIN:VEVENT\r\n/g) || []).length, 2);
-  assert.match(calendar, /SUMMARY:TEST-999 · 考试 · Example Seminar/);
+  assert.match(calendar, /SUMMARY:TEST-999 · Exam · Example Seminar/);
   assert.match(calendar, /LOCATION:Example Room 1/);
   assert.doesNotMatch(calendar, /FAKE-EVENT|Example Campus|20270316T/);
 });

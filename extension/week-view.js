@@ -1,4 +1,6 @@
 (() => {
+  const i18n = globalThis.TritonCalI18n;
+  const t = (...args) => i18n.t(...args);
   const parser = globalThis.TritonCalParser;
   const ics = globalThis.TritonCalIcs;
   const offline = globalThis.TritonCalOffline;
@@ -124,7 +126,7 @@
   }
 
   function dayLabel(date, mode) {
-    return new Intl.DateTimeFormat("zh-CN", {
+    return new Intl.DateTimeFormat(i18n.locale(), {
       timeZone: "UTC", weekday: "short", ...(mode === "final" ? { month: "numeric", day: "numeric" } : {})
     }).format(new Date(`${date}T12:00:00Z`));
   }
@@ -151,6 +153,7 @@
   function create() {
     const host = element("div");
     host.id = "tritoncal-week-root";
+    host.lang = i18n.locale();
     host.style.display = "none";
     const shadow = host.attachShadow({ mode: "closed" });
     const style = element("style", `
@@ -163,6 +166,8 @@
       h1 { font-size: 22px; letter-spacing: -.02em; margin: 0; } .range { color: #637486; margin: 3px 0 0; font-size: 13px; }
       .controls { margin-top: 15px; justify-content: flex-start; } .controls button, .close { border: 1px solid #d7e0e8; background: white; color: #2b455f; border-radius: 8px; padding: 7px 10px; }
       .controls button:hover, .close:hover { background: #f3f7fa; } .close { font-size: 20px; line-height: 1; width: 36px; height: 36px; }
+      .heading-actions { display: flex; align-items: center; gap: 10px; }
+      .language-switch { border: 1px solid #d7e0e8; background: white; color: #2b455f; border-radius: 8px; padding: 7px 10px; }
       .controls .selected { background: #e7f1f8; border-color: #a8c8df; color: #145c8c; }
       .note { color: #65788a; font-size: 12px; margin: 10px 0 0; }
       .scroll { overflow: auto; flex: 1; background: #fff; }
@@ -210,6 +215,7 @@
 
     function close() { host.style.display = "none"; shadow.replaceChildren(style); }
     function render(focusLabel = null, pixelsPerMinute = 1.7) {
+      host.lang = i18n.locale();
       const plan = viewMode === "typical" ? planTypicalWeek(events) : planFinal(events);
       shadow.replaceChildren(style);
       const backdrop = element("div", null, "backdrop");
@@ -218,23 +224,29 @@
       const shell = element("div", null, "shell");
       shell.setAttribute("role", "dialog");
       shell.setAttribute("aria-modal", "true");
-      shell.setAttribute("aria-label", "TritonCal 周课表");
+      shell.setAttribute("aria-label", t("dialogTitle"));
       shadow.append(shell);
       const header = element("header");
       const heading = element("div", null, "heading");
       const title = element("div");
       const range = viewMode === "typical"
-        ? `每周 ${plan.count} 个常规时段 · 按已读取的 ${plan.weeks} 周归并`
-        : plan.count ? `${plan.firstDate} — ${plan.lastDate} · ${plan.count} 项安排` : "尚未读到期末安排";
-      title.append(element("h1", (viewMode === "typical" ? "典型周" : "Final")), element("p", range, "range"));
+        ? t("typicalRange", plan.count, plan.weeks)
+        : plan.count ? t("finalRange", i18n.date(plan.firstDate), i18n.date(plan.lastDate), plan.count) : t("noFinalLoaded");
+      title.append(element("h1", t(viewMode === "typical" ? "typical" : "final")), element("p", range, "range"));
       const closeButton = element("button", "×", "close");
       closeButton.type = "button";
-      closeButton.setAttribute("aria-label", "关闭周课表");
+      closeButton.setAttribute("aria-label", t("closeWeek"));
       closeButton.addEventListener("click", close);
-      heading.append(title, closeButton);
+      const languageButton = element("button", t("switchLanguage"), "language-switch");
+      languageButton.type = "button";
+      languageButton.lang = i18n.locale() === "en-US" ? "zh-CN" : "en";
+      languageButton.addEventListener("click", i18n.toggleLanguage);
+      const headingActions = element("div", null, "heading-actions");
+      headingActions.append(languageButton, closeButton);
+      heading.append(title, headingActions);
       header.append(heading);
       const controls = element("div", null, "controls");
-      for (const [label, mode] of [["典型周", "typical"], ["Final", "final"]]) {
+      for (const [label, mode] of [[t("typical"), "typical"], [t("final"), "final"]]) {
         const button = element("button", label, viewMode === mode ? "selected" : "");
         button.type = "button";
         button.setAttribute("aria-pressed", String(viewMode === mode));
@@ -246,28 +258,28 @@
       }
       const palette = element("div", null, "palette");
       palette.setAttribute("role", "group");
-      palette.setAttribute("aria-label", "单色颜色");
-      for (const [key, color] of [["雾蓝", "#7893a9"], ["海蓝", "#4a83ad"], ["藤紫", "#8c80ac"], ["鼠尾草", "#679889"], ["橄榄", "#879d65"], ["沙金", "#ae8a5c"], ["玫瑰", "#a57995"]]) {
-        const name = key;
+      palette.setAttribute("aria-label", t("palette"));
+      for (const [key, color] of [["mist", "#7893a9"], ["ocean", "#4a83ad"], ["lavender", "#8c80ac"], ["sage", "#679889"], ["olive", "#879d65"], ["sand", "#ae8a5c"], ["rose", "#a57995"]]) {
+        const name = t(key);
         const swatch = element("button", null, "swatch");
         swatch.type = "button";
         swatch.dataset.color = color;
         swatch.style.setProperty("--swatch", color);
         swatch.title = name;
-        swatch.setAttribute("aria-label", `单色：${name}`);
+        swatch.setAttribute("aria-label", t("swatchLabel", name));
         swatch.setAttribute("aria-pressed", String(monoColor === color));
         swatch.addEventListener("click", () => { setMonoColor(color); customInput.value = color; });
         palette.append(swatch);
       }
-      const customLabel = element("label", "自定义", "custom-color");
+      const customLabel = element("label", t("custom"), "custom-color");
       const customInput = element("input");
       customInput.type = "color";
       customInput.value = monoColor;
-      customInput.setAttribute("aria-label", "自定义单色");
+      customInput.setAttribute("aria-label", t("customColor"));
       customInput.addEventListener("input", () => setMonoColor(customInput.value));
       customLabel.append(customInput);
       palette.append(customLabel);
-      for (const [label, mode] of [["按课上色", "course"], ["单色", "mono"]]) {
+      for (const [label, mode] of [[t("courseColors"), "course"], [t("mono"), "mono"]]) {
         const button = element("button", label, colorMode === mode ? "selected" : "");
         button.type = "button";
         button.setAttribute("aria-pressed", String(colorMode === mode));
@@ -275,23 +287,23 @@
         controls.append(button);
       }
       if (colorMode === "mono") controls.append(palette);
-      const exportButton = element("button", `导出已读取课程 (.ics · ${events.length} 条)`);
+      const exportButton = element("button", t("exportIcs", events.length));
       exportButton.type = "button";
       exportButton.disabled = events.length === 0;
       exportButton.addEventListener("click", () => downloadCalendar(events));
       controls.append(exportButton);
-      const offlineButton = element("button", "下载手机离线课表 (.html)");
+      const offlineButton = element("button", t("exportOffline"));
       offlineButton.type = "button";
       offlineButton.disabled = events.length === 0;
       offlineButton.addEventListener("click", () => downloadOffline(events));
       controls.append(offlineButton);
       header.append(controls, element("p", viewMode === "typical"
-        ? `同一时段至少出现 ${plan.threshold || 1} 周才列入典型周；请先让 TSS 加载完整学期。导出仍包含已读取的全部日期。`
-        : ["按 UCSD 官方期末周显示已读取安排（校历覆盖 2026 秋至 2027 春）。", plan.unmarkedCount ? `其中 ${plan.unmarkedCount} 项未被 TSS 标记为考试，请以课程详情的 Final Examination 为准。` : "", plan.unknownTermCount ? "另含未覆盖学期的 TSS 已标记考试，需在课程详情确认是否为期末。" : ""].filter(Boolean).join(" "), "note"));
+        ? t("typicalNote", plan.threshold || 1)
+        : [t("finalNote"), plan.unmarkedCount ? t("unmarkedNote", plan.unmarkedCount) : "", plan.unknownTermCount ? t("unknownTermNote") : ""].filter(Boolean).join(" "), "note"));
       shell.append(header);
 
       const scroll = element("div", null, "scroll");
-      if (!plan.count) scroll.append(element("p", (viewMode === "typical" ? "没有符合频次条件的常规课程。" : "尚未读到期末周安排；这不代表没有考试。请在 TSS 课程详情核对 Final Examination，并让首页加载完整学期。"), "empty"));
+      if (!plan.count) scroll.append(element("p", t(viewMode === "typical" ? "typicalEmpty" : "finalEmpty"), "empty"));
       const grid = element("div", null, "grid");
       grid.style.gridTemplateColumns = `58px repeat(${plan.days.length}, minmax(150px, 1fr))`;
       grid.style.minWidth = `${58 + plan.days.length * 150}px`;
@@ -327,12 +339,12 @@
           card.style.height = `${(item.end - item.start) * pixelsPerMinute - 4}px`;
           card.style.left = `calc(${item.column * 100 / item.columns}% + 2px)`;
           card.style.width = `calc(${100 / item.columns}% - 4px)`;
-          card.title = `${item.event.name || "未命名课程"} · ${item.event.title || "课名待确认"} · ${item.event.start}–${item.event.end} · ${item.event.room || "教室待确认"}`;
-          const kind = item.event.isExam === true ? "考试" : viewMode === "final" ? "期末周安排" : item.event.type;
-          card.append(element("strong", `${item.event.code || item.event.name || "未命名课程"}${kind ? ` · ${kind}` : ""}`));
-          card.append(element("span", item.event.title || "课名待确认"));
+          card.title = `${item.event.name || t("unnamedCourse")} · ${item.event.title || t("titleUnknown")} · ${item.event.start}–${item.event.end} · ${item.event.room || t("roomUnknown")}`;
+          const kind = item.event.isExam === true ? t("exam") : viewMode === "final" ? t("finalEvent") : item.event.type;
+          card.append(element("strong", `${item.event.code || item.event.name || t("unnamedCourse")}${kind ? ` · ${kind}` : ""}`));
+          card.append(element("span", item.event.title || t("titleUnknown")));
           card.append(element("span", `${item.event.start}–${item.event.end}`));
-          card.append(element("span", item.event.room || "教室待确认"));
+          card.append(element("span", item.event.room || t("roomUnknown")));
           column.append(card);
           cards.push(card);
         }
@@ -347,9 +359,17 @@
         return;
       }
       const focusedControl = Array.from(controls.children).find(button => button.textContent === focusLabel);
-      (focusedControl || closeButton).focus();
+      (focusLabel === "language-switch" ? languageButton : focusedControl || closeButton).focus();
     }
 
+    i18n.onChange(() => {
+      host.lang = i18n.locale();
+      if (host.style.display === "none") return;
+      const scroll = shadow.querySelector(".scroll");
+      const position = { top: scroll.scrollTop, left: scroll.scrollLeft };
+      render("language-switch");
+      shadow.querySelector(".scroll").scrollTo(position);
+    });
     window.addEventListener("keydown", event => {
       if (event.key === "Escape" && host.style.display !== "none") close();
     });

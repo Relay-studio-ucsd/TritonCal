@@ -73,11 +73,11 @@
   // 用 TSS 已给出的每次上课日期逐条导出，假期自然保持空白。
   function generateCalendar(events, options = {}) {
     const now = options.now ?? new Date();
-    const calendarName = options.calendarName ?? "TritonCal 课程";
+    const calendarName = options.calendarName ?? "TritonCal Courses";
     const lines = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//TritonCal//TSS Course Calendar//ZH",
+      "PRODID:-//TritonCal//TSS Course Calendar//EN",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
       `X-WR-CALNAME:${escapeText(calendarName)}`,
@@ -93,8 +93,8 @@
       const eventUid = uid(event);
       if (seen.has(eventUid)) continue;
       seen.add(eventUid);
-      const code = event.code || event.name;
-      const kind = event.isExam ? "考试" : event.type || "课程";
+      const code = event.code || event.name || "Unnamed course";
+      const kind = event.isExam === true ? "Exam" : ({ LE: "Lecture", DI: "Discussion", LA: "Laboratory", SE: "Seminar" }[event.type] || event.type || "Course");
       const summary = `${code} · ${kind}${event.title ? ` · ${event.title}` : ""}`;
       const description = [event.name, event.section ? `Section: ${event.section}` : null].filter(Boolean).join("\n");
       lines.push(

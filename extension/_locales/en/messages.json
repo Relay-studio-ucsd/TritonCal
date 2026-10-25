@@ -1,0 +1,305 @@
+{
+  "switchLanguage": { "message": "中文", "description": "popup.js, content.js, week-view.js: language switch destination" },
+  "name": {
+    "message": "TritonCal · Schedule Preview",
+    "description": "manifest.json"
+  },
+  "description": {
+    "message": "View your TSS schedule and export a calendar or offline timetable using only data already loaded by TSS.",
+    "description": "manifest.json"
+  },
+  "actionTitle": {
+    "message": "View schedule",
+    "description": "manifest.json"
+  },
+  "schedule": {
+    "message": "Schedule",
+    "description": "content.js"
+  },
+  "openWeek": {
+    "message": "Open week view",
+    "description": "content.js, popup.html"
+  },
+  "typical": {
+    "message": "Typical week",
+    "description": "content.js, week-view.js"
+  },
+  "final": {
+    "message": "Final",
+    "description": "content.js, week-view.js"
+  },
+  "loadingTab": {
+    "message": "Reading the current tab…",
+    "description": "popup.html"
+  },
+  "openTss": {
+    "message": "Open the TSS website, then click the extension icon.",
+    "description": "popup.js"
+  },
+  "popupHint": {
+    "message": "Find your schedule using the Schedule button at the bottom right of TSS.",
+    "description": "popup.js"
+  },
+  "tabError": {
+    "message": "Cannot read this tab. Refresh the TSS home page and try again.",
+    "description": "popup.js"
+  },
+  "waitingRetry": {
+    "message": "No schedule received yet. Keep the extension enabled, refresh the TSS home page and try again.",
+    "description": "popup.js"
+  },
+  "openError": {
+    "message": "Cannot open the schedule. Refresh the TSS home page and try again.",
+    "description": "popup.js"
+  },
+  "waitingTss": {
+    "message": "Waiting for TSS to load your schedule…",
+    "description": "content.js"
+  },
+  "scheduleCount": {
+    "message": "Schedule · $ARG1$",
+    "description": "content.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "panelCount": {
+    "message": "$ARG1$ regular slots; $ARG2$ events loaded.",
+    "description": "content.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      }
+    }
+  },
+  "panelEmpty": {
+    "message": "No regular classes meet the frequency threshold. Open the week view to check Final.",
+    "description": "content.js"
+  },
+  "roomUnknown": {
+    "message": "Room to be confirmed",
+    "description": "content.js, week-view.js, offline.js"
+  },
+  "titleUnknown": {
+    "message": "Course title to be confirmed",
+    "description": "week-view.js, offline.js"
+  },
+  "unnamedCourse": {
+    "message": "Unnamed course",
+    "description": "parser.js"
+  },
+  "dialogTitle": {
+    "message": "TritonCal weekly schedule",
+    "description": "week-view.js"
+  },
+  "typicalRange": {
+    "message": "$ARG1$ regular slots per week · based on $ARG2$ weeks of loaded data",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      }
+    }
+  },
+  "finalRange": {
+    "message": "$ARG1$ — $ARG2$ · $ARG3$ events",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      },
+      "arg3": {
+        "content": "$3"
+      }
+    }
+  },
+  "noFinalLoaded": {
+    "message": "No finals-period events loaded yet",
+    "description": "week-view.js"
+  },
+  "closeWeek": {
+    "message": "Close week view",
+    "description": "week-view.js"
+  },
+  "palette": {
+    "message": "Single-color palette",
+    "description": "week-view.js"
+  },
+  "mist": {
+    "message": "Mist blue",
+    "description": "week-view.js"
+  },
+  "ocean": {
+    "message": "Ocean blue",
+    "description": "week-view.js"
+  },
+  "lavender": {
+    "message": "Lavender",
+    "description": "week-view.js"
+  },
+  "sage": {
+    "message": "Sage",
+    "description": "week-view.js"
+  },
+  "olive": {
+    "message": "Olive",
+    "description": "week-view.js"
+  },
+  "sand": {
+    "message": "Sand",
+    "description": "week-view.js"
+  },
+  "rose": {
+    "message": "Rose",
+    "description": "week-view.js"
+  },
+  "swatchLabel": {
+    "message": "Single color: $ARG1$",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "custom": {
+    "message": "Custom",
+    "description": "week-view.js"
+  },
+  "customColor": {
+    "message": "Custom single color",
+    "description": "week-view.js"
+  },
+  "courseColors": {
+    "message": "By course",
+    "description": "week-view.js, offline.js"
+  },
+  "mono": {
+    "message": "Single color",
+    "description": "week-view.js, offline.js"
+  },
+  "exportIcs": {
+    "message": "Export loaded events (.ics · $ARG1$)",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportOffline": {
+    "message": "Download offline schedule (.html)",
+    "description": "week-view.js"
+  },
+  "typicalNote": {
+    "message": "A slot must occur in at least $ARG1$ weeks to appear here. Let TSS load the full term. Exports include all loaded dates.",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "finalNote": {
+    "message": "Shows loaded events during UCSD's official finals periods (Fall 2026 through Spring 2027).",
+    "description": "week-view.js"
+  },
+  "unmarkedNote": {
+    "message": "$ARG1$ events have no TSS exam flag. Confirm them against Final Examination in the course details.",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "unknownTermNote": {
+    "message": "Also includes TSS-flagged exams from terms outside this calendar. Check the course details to confirm whether they are finals.",
+    "description": "week-view.js"
+  },
+  "typicalEmpty": {
+    "message": "No regular classes meet the frequency threshold.",
+    "description": "week-view.js"
+  },
+  "finalEmpty": {
+    "message": "No finals-period events loaded yet. This does not mean you have no exams. Check Final Examination in the TSS course details and let the home page load the full term.",
+    "description": "week-view.js"
+  },
+  "exam": {
+    "message": "Exam",
+    "description": "week-view.js, offline.js"
+  },
+  "finalEvent": {
+    "message": "Finals-period event",
+    "description": "week-view.js"
+  },
+  "offlineTitle": {
+    "message": "TritonCal offline schedule",
+    "description": "offline.js"
+  },
+  "offlineHeading": {
+    "message": "Offline weekly schedule",
+    "description": "offline.js"
+  },
+  "previousWeek": {
+    "message": "← Previous week",
+    "description": "offline.js"
+  },
+  "thisWeek": {
+    "message": "This week",
+    "description": "offline.js"
+  },
+  "nextWeek": {
+    "message": "Next week →",
+    "description": "offline.js"
+  },
+  "offlineSource": {
+    "message": "$ARG1$ events loaded at download · $ARG2$–$ARG3$ · This is an offline snapshot and will not update automatically.",
+    "description": "offline.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      },
+      "arg3": {
+        "content": "$3"
+      }
+    }
+  },
+  "offlineEmpty": {
+    "message": "This file contains no loaded events.",
+    "description": "offline.js"
+  },
+  "offlineRange": {
+    "message": "$ARG1$ — $ARG2$ · $ARG3$ events",
+    "description": "offline.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      },
+      "arg3": {
+        "content": "$3"
+      }
+    }
+  },
+  "noClasses": {
+    "message": "No classes",
+    "description": "offline.js"
+  }
+}

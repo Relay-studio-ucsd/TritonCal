@@ -6,7 +6,7 @@ const path = require("node:path");
 const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, "../extension/manifest.json"), "utf8"));
 
 test("插件权限和注入范围仅限当前 TSS 标签页", () => {
-  assert.deepEqual(manifest.permissions, ["activeTab"]);
+  assert.deepEqual(manifest.permissions, ["activeTab", "storage"]);
   assert.equal(manifest.host_permissions, undefined);
   assert.equal(manifest.background, undefined);
   assert.equal(manifest.externally_connectable, undefined);

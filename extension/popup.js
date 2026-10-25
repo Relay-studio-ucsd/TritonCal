@@ -1,20 +1,34 @@
 (() => {
+  const { t, locale, ready, onChange, toggleLanguage } = globalThis.TritonCalI18n;
   const status = document.querySelector("#status");
   const openButton = document.querySelector("#open-week");
   let tabId = null;
+  let statusKey = "loadingTab";
+  const languageButton = document.querySelector("#language-switch");
+  function render() {
+    document.documentElement.lang = locale();
+    status.textContent = t(statusKey);
+    openButton.textContent = t("openWeek");
+    languageButton.textContent = t("switchLanguage");
+    languageButton.lang = locale() === "en-US" ? "zh-CN" : "en";
+  }
+  function setStatus(key) { statusKey = key; render(); }
+  languageButton.addEventListener("click", toggleLanguage);
+  onChange(render);
+
   // 工具栏只负责打开当前 TSS 标签页内的课表，避免重复显示课程列表。
   async function load() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab?.url || new URL(tab.url).origin !== "https://tss.ucsd.edu") {
-        status.textContent = "请先打开 TSS 官网，再点击插件图标。";
+        setStatus("openTss");
         return;
       }
       tabId = tab.id;
-      status.textContent = "课表在 TSS 页面右下角的「课表」按钮里";
+      setStatus("popupHint");
       openButton.hidden = false;
     } catch {
-      status.textContent = "无法读取此标签页。请在 TSS 首页刷新后重试。";
+      setStatus("tabError");
     }
   }
 
@@ -23,13 +37,13 @@
     try {
       const response = await chrome.tabs.sendMessage(tabId, { type: "tritoncal:open-week-view" });
       if (response?.opened) window.close();
-      else status.textContent = "尚未收到课表。保持插件启用，刷新 TSS 首页后重试。";
+      else setStatus("waitingRetry");
     } catch {
-      status.textContent = "无法打开课表。请在 TSS 首页刷新后重试。";
+      setStatus("openError");
     } finally {
       openButton.disabled = false;
     }
   });
 
-  load();
+  ready.then(() => { render(); load(); });
 })();

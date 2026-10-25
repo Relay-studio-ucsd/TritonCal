@@ -1,11 +1,12 @@
 {
   "name": "tritoncal",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.5.5",
   "type": "module",
   "scripts": {
-    "test": "node --test",
-    "package": "node scripts/package.cjs"
+    "test": "node --test tests/*.test.cjs",
+    "build:locales": "node scripts/build-locales.cjs",
+    "package": "node scripts/build-locales.cjs && node scripts/package.cjs"
   },
   "engines": {
     "node": ">=20"

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,11 +10,16 @@
     p { margin: 0; }
     button { margin-top: 14px; width: 100%; font: inherit; padding: 9px 12px; border: 0; border-radius: 8px; background: #1468a0; color: white; cursor: pointer; }
     button:disabled { opacity: .5; cursor: default; }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    #language-switch { width: auto; margin: 0; background: white; color: #2b455f; border: 1px solid #d7e0e8; padding: 5px 9px; }
   </style>
 </head>
 <body>
-  <p id="status" role="status">正在读取当前标签页…</p>
-  <button id="open-week" type="button" hidden>打开周视图</button>
+  <header><strong>TritonCal</strong><button id="language-switch" type="button"></button></header>
+  <p id="status" role="status"></p>
+  <button id="open-week" type="button" hidden></button>
+  <script src="locales.js"></script>
+  <script src="i18n.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

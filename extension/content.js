@@ -1,4 +1,5 @@
 (() => {
+  const { t, date, locale, ready, onChange, toggleLanguage } = globalThis.TritonCalI18n;
   const channel = "tritoncal:timetable:v1";
   let latest = null;
   let panel = null;
@@ -16,33 +17,43 @@
   // 用页面内的小面板展示实验结果，方便 Arc 中直接验收。
   function renderPanel() {
     if (!panelBody || !toggle) return;
+    const host = document.getElementById("tritoncal-extension-root");
+    host.lang = locale();
+    const focusLanguage = panelBody.getRootNode().activeElement?.classList.contains("language-switch");
     panelBody.replaceChildren();
-    panelBody.append(make("h2", "课表"));
-    panelBody.append(make("p", `${"典型周"} · ${"Final"}`, "muted"));
-    const openWeek = make("button", "打开周视图", "open-week");
+    const heading = make("div", "", "heading");
+    const languageButton = make("button", t("switchLanguage"), "language-switch");
+    languageButton.type = "button";
+    languageButton.lang = locale() === "en-US" ? "zh-CN" : "en";
+    languageButton.addEventListener("click", toggleLanguage);
+    heading.append(make("h2", t("schedule")), languageButton);
+    panelBody.append(heading);
+    if (focusLanguage) languageButton.focus();
+    panelBody.append(make("p", `${t("typical")} · ${t("final")}`, "muted"));
+    const openWeek = make("button", t("openWeek"), "open-week");
     openWeek.type = "button";
     openWeek.disabled = !latest;
     openWeek.addEventListener("click", () => weekView?.open(latest.events));
     panelBody.append(openWeek);
     if (!latest) {
-      toggle.textContent = "课表";
-      panelBody.append(make("p", "等待 TSS 页面加载课表…"));
+      toggle.textContent = t("schedule");
+      panelBody.append(make("p", t("waitingTss")));
       return;
     }
     const plan = globalThis.TritonCalWeekView.planTypicalWeek(latest.events);
-    toggle.textContent = `课表 · ${plan.count}`;
-    panelBody.append(make("p", `典型周 ${plan.count} 个时段；已读取 ${latest.events.length} 次课程。`, "muted"));
+    toggle.textContent = t("scheduleCount", plan.count);
+    panelBody.append(make("p", t("panelCount", plan.count, latest.events.length), "muted"));
     if (!plan.count) {
-      panelBody.append(make("p", "没有符合频次条件的常规课程，可打开周视图查看 Final。"));
+      panelBody.append(make("p", t("panelEmpty")));
       return;
     }
     for (const day of plan.days) {
       if (!day.events.length) continue;
-      panelBody.append(make("h3", new Intl.DateTimeFormat("zh-CN", { timeZone: "UTC", weekday: "short" }).format(new Date(`${day.date}T12:00:00Z`))));
+      panelBody.append(make("h3", date(day.date, { weekday: "short" })));
       for (const { event } of day.events) {
         const card = make("div", "", "card");
-        card.append(make("strong", event.name || "未命名课程"));
-        card.append(make("span", `${event.start}–${event.end} · ${event.room || "教室待确认"}`));
+        card.append(make("strong", event.name || t("unnamedCourse")));
+        card.append(make("span", `${event.start}–${event.end} · ${event.room || t("roomUnknown")}`));
         panelBody.append(card);
       }
     }
@@ -52,6 +63,7 @@
     if (!document.body || document.getElementById("tritoncal-extension-root")) return;
     const host = make("div");
     host.id = "tritoncal-extension-root";
+    host.lang = locale();
     const shadow = host.attachShadow({ mode: "closed" });
     const style = make("style", `
       :host { all: initial; position: fixed; right: 20px; bottom: 20px; z-index: 2147483647; font: 14px/1.45 system-ui, sans-serif; color: #17324d; }
@@ -61,12 +73,14 @@
       .panel-body { max-height: min(540px, calc(100vh - 102px)); overflow: auto; scrollbar-width: thin; box-sizing: border-box; padding: 16px; }
       .panel.open { display: block; }
       h2 { font-size: 18px; margin: 0 0 2px; } h3 { font-size: 13px; margin: 14px 0 5px; color: #426079; }
+      .heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+      .language-switch { border: 1px solid #d7e0e8; border-radius: 7px; background: white; color: #2b455f; padding: 5px 9px; }
       p { margin: 4px 0 12px; } .muted { color: #62788a; font-size: 12px; }
       .open-week { width: 100%; background: #1468a0; border: 0; border-radius: 7px; color: white; font-weight: 650; padding: 8px; margin: 0 0 12px; } .open-week:disabled { opacity: .5; cursor: default; }
       .card { border-top: 1px solid #e4edf3; padding: 8px 0; } .card strong, .card span { display: block; }
       .card span { color: #526a7f; font-size: 12px; margin-top: 2px; }
     `);
-    toggle = make("button", "课表", "toggle");
+    toggle = make("button", t("schedule"), "toggle");
     toggle.type = "button";
     toggle.setAttribute("aria-expanded", "false");
     panel = make("div", "", "panel");
@@ -82,8 +96,11 @@
     renderPanel();
   }
 
-  if (document.body) mountPanel();
-  else document.addEventListener("DOMContentLoaded", mountPanel, { once: true });
+  ready.then(() => {
+    if (document.body) mountPanel();
+    else document.addEventListener("DOMContentLoaded", mountPanel, { once: true });
+  });
+  onChange(renderPanel);
 
   // 接收 MAIN world 被动复制的响应，只在内存中保留显示字段。
   window.addEventListener("message", event => {

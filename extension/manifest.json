@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "TritonCal · 本周课表实验版",
-  "version": "0.5.1",
-  "description": "只读取 TSS 页面已加载的课表响应，显示周课表并导出日历或手机离线课表。",
+  "name": "__MSG_name__",
+  "version": "0.5.5",
+  "default_locale": "en",
+  "description": "__MSG_description__",
   "action": {
-    "default_title": "查看本周课表",
+    "default_title": "__MSG_actionTitle__",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
@@ -25,7 +26,7 @@
       }
     }
   },
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "storage"],
   "content_scripts": [
     {
       "matches": ["https://tss.ucsd.edu/*"],
@@ -35,7 +36,7 @@
     },
     {
       "matches": ["https://tss.ucsd.edu/*"],
-      "js": ["parser.js", "ics.js", "offline.js", "week-view.js", "content.js"],
+      "js": ["locales.js", "i18n.js", "parser.js", "ics.js", "offline.js", "week-view.js", "content.js"],
       "run_at": "document_start"
     }
   ]
