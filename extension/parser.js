@@ -24,7 +24,7 @@
   function parseTimetable(body) {
     const document = JSON.parse(body);
     const rows = document?.d?.results;
-    if (!Array.isArray(rows)) throw new Error("响应不是 OData v2 的 d.results 列表");
+    if (!Array.isArray(rows)) throw new Error("Expected an OData v2 d.results array");
     const seen = new Set();
     const events = [];
     for (const row of rows) {
@@ -36,7 +36,7 @@
       const key = `${row.EventId}|${date}|${start}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      const name = String(row.EventName ?? row.CourseName ?? "未命名课程");
+      const name = String(row.EventName ?? row.CourseName ?? "");
       const identity = /^(.+)-([A-Z]{2})\s+\(([^)]+)\)$/.exec(name);
       events.push({
         id: String(row.EventId),

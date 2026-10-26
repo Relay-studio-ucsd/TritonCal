@@ -46,7 +46,7 @@ test("UID 稳定，房间和标题正确转义", () => {
   const a = generateCalendar([item], { now: new Date("2026-10-20T12:00:00Z") });
   const b = generateCalendar([item], { now: new Date("2026-10-21T12:00:00Z") });
   assert.equal(a.match(/^UID:(.+)$/m)[1], b.match(/^UID:(.+)$/m)[1]);
-  assert.match(a, /SUMMARY:TEST-001 · LE · A\\, B\\; C\\\\D/);
+  assert.match(a, /SUMMARY:TEST-001 · Lecture · A\\, B\\; C\\\\D/);
   assert.match(a, /LOCATION:Room 1\\; West/);
   assert.equal(escapeText("a\nb"), "a\\nb");
 });
@@ -65,6 +65,6 @@ test("考试按已确认字段标识，空教室不写伪地点", () => {
   item.isExam = true;
   item.room = null;
   const text = generateCalendar([item], { now: new Date("2026-10-20T12:00:00Z") });
-  assert.match(text, /SUMMARY:TEST-001 · 考试 · Example Course/);
+  assert.match(text, /SUMMARY:TEST-001 · Exam · Example Course/);
   assert.doesNotMatch(text, /LOCATION:/);
 });

@@ -4,7 +4,10 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-const context = vm.createContext({ JSON });
+const { chromeFor } = require("./helpers/i18n.cjs");
+const context = vm.createContext({ JSON, chrome: chromeFor() });
+vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/locales.js"), "utf8"), context);
+vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/i18n.js"), "utf8"), context);
 vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/offline.js"), "utf8"), context);
 const { generateOfflineHtml } = context.TritonCalOffline;
 
@@ -29,7 +32,7 @@ test("离线课表只带显示字段，独立打开不需网络资源", () => {
 });
 
 test("课程文本不能提前结束数据脚本或注入页面", () => {
-  const attack = "</script><script>globalThis.injected=true</script>&";
+  const attack = "</script><script>globalThis.injected=true</script>&__TRITONCAL_I18N__";
   const html = generateOfflineHtml([{
     date: "2026-10-20", start: "11:00", end: "12:20", code: "TEST-001",
     type: "LE", name: "TEST-001-LE", title: attack, room: "", isExam: false

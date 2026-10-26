@@ -1,90 +1,49 @@
 (() => {
-  const parser = globalThis.TritonCalParser;
+  const { t, locale, ready, onChange, toggleLanguage } = globalThis.TritonCalI18n;
   const status = document.querySelector("#status");
-  const days = document.querySelector("#days");
-  const range = document.querySelector("#range");
-  let weekStart = parser.mondayOf(parser.todayInTimezone());
-  let events = [];
-  let ready = false;
-
-  function line(className, text) {
-    const element = document.createElement("div");
-    element.className = className;
-    element.textContent = text;
-    return element;
-  }
-
-  function dayLabel(ymd) {
-    return new Intl.DateTimeFormat("zh-CN", {
-      timeZone: "UTC", weekday: "long", month: "numeric", day: "numeric"
-    }).format(new Date(`${ymd}T12:00:00Z`));
-  }
-
-  // 按本地星期展示从 TSS 实际响应读取的逐日事件。
+  const openButton = document.querySelector("#open-week");
+  let tabId = null;
+  let statusKey = "loadingTab";
+  const languageButton = document.querySelector("#language-switch");
   function render() {
-    const weekEnd = parser.addDays(weekStart, 6);
-    range.textContent = `${weekStart} — ${weekEnd}`;
-    days.replaceChildren();
-    if (!ready) return;
-    const current = events.filter(event => event.date >= weekStart && event.date <= weekEnd);
-    if (!current.length) {
-      days.append(line("empty", "这一周没有已读取的课程。"));
-      return;
-    }
-    for (let offset = 0; offset < 7; offset++) {
-      const date = parser.addDays(weekStart, offset);
-      const daily = current.filter(event => event.date === date);
-      if (!daily.length) continue;
-      const section = document.createElement("section");
-      const heading = document.createElement("h2");
-      heading.textContent = dayLabel(date);
-      section.append(heading);
-      for (const event of daily) {
-        const card = document.createElement("article");
-        card.className = `event${event.isExam ? " exam" : ""}`;
-        card.append(line("name", event.name));
-        card.append(line("detail", `${event.start}–${event.end} · ${event.room || "教室待确认"}`));
-        if (event.title && event.title !== event.name) card.append(line("detail", event.title));
-        section.append(card);
-      }
-      days.append(section);
-    }
+    document.documentElement.lang = locale();
+    status.textContent = t(statusKey);
+    openButton.textContent = t("openWeek");
+    languageButton.textContent = t("switchLanguage");
+    languageButton.lang = locale() === "en-US" ? "zh-CN" : "en";
   }
+  function setStatus(key) { statusKey = key; render(); }
+  languageButton.addEventListener("click", toggleLanguage);
+  onChange(render);
 
-  document.querySelector("#previous").addEventListener("click", () => {
-    weekStart = parser.addDays(weekStart, -7);
-    render();
-  });
-  document.querySelector("#next").addEventListener("click", () => {
-    weekStart = parser.addDays(weekStart, 7);
-    render();
-  });
-  document.querySelector("#today").addEventListener("click", () => {
-    weekStart = parser.mondayOf(parser.todayInTimezone());
-    render();
-  });
-
+  // 工具栏只负责打开当前 TSS 标签页内的课表，避免重复显示课程列表。
   async function load() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (!tab?.url?.startsWith("https://tss.ucsd.edu/")) {
-        status.textContent = "请先打开 TSS 官网，再点击插件图标。";
+      if (!tab?.url || new URL(tab.url).origin !== "https://tss.ucsd.edu") {
+        setStatus("openTss");
         return;
       }
-      const response = await chrome.tabs.sendMessage(tab.id, { type: "tritoncal:get-timetable" });
-      if (response?.waiting || !Array.isArray(response?.events)) {
-        status.textContent = "尚未收到课表。保持插件启用，刷新 TSS 首页后重试。";
-        return;
-      }
-      events = response.events;
-      ready = true;
-      status.textContent = `收到 ${response.totalRows} 条记录，识别 ${response.events.length} 次有效课程 · 数据只保存在此标签页的内存中`;
-      render();
+      tabId = tab.id;
+      setStatus("popupHint");
+      openButton.hidden = false;
     } catch {
-      status.textContent = "无法读取此标签页。请在 TSS 首页刷新后重试。";
+      setStatus("tabError");
     }
   }
 
-  render();
-  load();
+  openButton.addEventListener("click", async () => {
+    openButton.disabled = true;
+    try {
+      const response = await chrome.tabs.sendMessage(tabId, { type: "tritoncal:open-week-view" });
+      if (response?.opened) window.close();
+      else setStatus("waitingRetry");
+    } catch {
+      setStatus("openError");
+    } finally {
+      openButton.disabled = false;
+    }
+  });
+
+  ready.then(() => { render(); load(); });
 })();

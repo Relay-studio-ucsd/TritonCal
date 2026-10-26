@@ -1,0 +1,305 @@
+{
+  "switchLanguage": { "message": "English", "description": "popup.js, content.js, week-view.js: language switch destination" },
+  "name": {
+    "message": "TritonCal · 课表实验版",
+    "description": "manifest.json"
+  },
+  "description": {
+    "message": "只读取 TSS 页面已加载的课表响应，显示周课表并导出日历或手机离线课表。",
+    "description": "manifest.json"
+  },
+  "actionTitle": {
+    "message": "查看课表",
+    "description": "manifest.json"
+  },
+  "schedule": {
+    "message": "课表",
+    "description": "content.js"
+  },
+  "openWeek": {
+    "message": "打开周视图",
+    "description": "content.js, popup.html"
+  },
+  "typical": {
+    "message": "典型周",
+    "description": "content.js, week-view.js"
+  },
+  "final": {
+    "message": "Final",
+    "description": "content.js, week-view.js"
+  },
+  "loadingTab": {
+    "message": "正在读取当前标签页…",
+    "description": "popup.html"
+  },
+  "openTss": {
+    "message": "请先打开 TSS 官网，再点击插件图标。",
+    "description": "popup.js"
+  },
+  "popupHint": {
+    "message": "课表在 TSS 页面右下角的「课表」按钮里",
+    "description": "popup.js"
+  },
+  "tabError": {
+    "message": "无法读取此标签页。请在 TSS 首页刷新后重试。",
+    "description": "popup.js"
+  },
+  "waitingRetry": {
+    "message": "尚未收到课表。保持插件启用，刷新 TSS 首页后重试。",
+    "description": "popup.js"
+  },
+  "openError": {
+    "message": "无法打开课表。请在 TSS 首页刷新后重试。",
+    "description": "popup.js"
+  },
+  "waitingTss": {
+    "message": "等待 TSS 页面加载课表…",
+    "description": "content.js"
+  },
+  "scheduleCount": {
+    "message": "课表 · $ARG1$",
+    "description": "content.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "panelCount": {
+    "message": "典型周 $ARG1$ 个时段；已读取 $ARG2$ 次课程。",
+    "description": "content.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      }
+    }
+  },
+  "panelEmpty": {
+    "message": "没有符合频次条件的常规课程，可打开周视图查看 Final。",
+    "description": "content.js"
+  },
+  "roomUnknown": {
+    "message": "教室待确认",
+    "description": "content.js, week-view.js, offline.js"
+  },
+  "titleUnknown": {
+    "message": "课名待确认",
+    "description": "week-view.js, offline.js"
+  },
+  "unnamedCourse": {
+    "message": "未命名课程",
+    "description": "parser.js"
+  },
+  "dialogTitle": {
+    "message": "TritonCal 周课表",
+    "description": "week-view.js"
+  },
+  "typicalRange": {
+    "message": "每周 $ARG1$ 个常规时段 · 按已读取的 $ARG2$ 周归并",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      }
+    }
+  },
+  "finalRange": {
+    "message": "$ARG1$ — $ARG2$ · $ARG3$ 项安排",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      },
+      "arg3": {
+        "content": "$3"
+      }
+    }
+  },
+  "noFinalLoaded": {
+    "message": "尚未读到期末安排",
+    "description": "week-view.js"
+  },
+  "closeWeek": {
+    "message": "关闭周课表",
+    "description": "week-view.js"
+  },
+  "palette": {
+    "message": "单色颜色",
+    "description": "week-view.js"
+  },
+  "mist": {
+    "message": "雾蓝",
+    "description": "week-view.js"
+  },
+  "ocean": {
+    "message": "海蓝",
+    "description": "week-view.js"
+  },
+  "lavender": {
+    "message": "藤紫",
+    "description": "week-view.js"
+  },
+  "sage": {
+    "message": "鼠尾草",
+    "description": "week-view.js"
+  },
+  "olive": {
+    "message": "橄榄",
+    "description": "week-view.js"
+  },
+  "sand": {
+    "message": "沙金",
+    "description": "week-view.js"
+  },
+  "rose": {
+    "message": "玫瑰",
+    "description": "week-view.js"
+  },
+  "swatchLabel": {
+    "message": "单色：$ARG1$",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "custom": {
+    "message": "自定义",
+    "description": "week-view.js"
+  },
+  "customColor": {
+    "message": "自定义单色",
+    "description": "week-view.js"
+  },
+  "courseColors": {
+    "message": "按课上色",
+    "description": "week-view.js, offline.js"
+  },
+  "mono": {
+    "message": "单色",
+    "description": "week-view.js, offline.js"
+  },
+  "exportIcs": {
+    "message": "导出已读取课程 (.ics · $ARG1$ 条)",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportOffline": {
+    "message": "下载手机离线课表 (.html)",
+    "description": "week-view.js"
+  },
+  "typicalNote": {
+    "message": "同一时段至少出现 $ARG1$ 周才列入典型周；请先让 TSS 加载完整学期。导出仍包含已读取的全部日期。",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "finalNote": {
+    "message": "按 UCSD 官方期末周显示已读取安排（校历覆盖 2026 秋至 2027 春）。",
+    "description": "week-view.js"
+  },
+  "unmarkedNote": {
+    "message": "其中 $ARG1$ 项未被 TSS 标记为考试，请以课程详情的 Final Examination 为准。",
+    "description": "week-view.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      }
+    }
+  },
+  "unknownTermNote": {
+    "message": "另含未覆盖学期的 TSS 已标记考试，需在课程详情确认是否为期末。",
+    "description": "week-view.js"
+  },
+  "typicalEmpty": {
+    "message": "没有符合频次条件的常规课程。",
+    "description": "week-view.js"
+  },
+  "finalEmpty": {
+    "message": "尚未读到期末周安排；这不代表没有考试。请在 TSS 课程详情核对 Final Examination，并让首页加载完整学期。",
+    "description": "week-view.js"
+  },
+  "exam": {
+    "message": "考试",
+    "description": "week-view.js, offline.js"
+  },
+  "finalEvent": {
+    "message": "期末周安排",
+    "description": "week-view.js"
+  },
+  "offlineTitle": {
+    "message": "TritonCal 离线课表",
+    "description": "offline.js"
+  },
+  "offlineHeading": {
+    "message": "离线周课表",
+    "description": "offline.js"
+  },
+  "previousWeek": {
+    "message": "← 上周",
+    "description": "offline.js"
+  },
+  "thisWeek": {
+    "message": "本周",
+    "description": "offline.js"
+  },
+  "nextWeek": {
+    "message": "下周 →",
+    "description": "offline.js"
+  },
+  "offlineSource": {
+    "message": "下载时已读取 $ARG1$ 次课程 · $ARG2$—$ARG3$ · 此文件是离线快照，不会自动更新",
+    "description": "offline.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      },
+      "arg3": {
+        "content": "$3"
+      }
+    }
+  },
+  "offlineEmpty": {
+    "message": "此文件没有已读取的课程。",
+    "description": "offline.js"
+  },
+  "offlineRange": {
+    "message": "$ARG1$ — $ARG2$ · $ARG3$ 次课程",
+    "description": "offline.js",
+    "placeholders": {
+      "arg1": {
+        "content": "$1"
+      },
+      "arg2": {
+        "content": "$2"
+      },
+      "arg3": {
+        "content": "$3"
+      }
+    }
+  },
+  "noClasses": {
+    "message": "无课程",
+    "description": "offline.js"
+  }
+}
