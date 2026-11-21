@@ -5,10 +5,10 @@ const root = path.join(__dirname, "..");
 const extension = path.join(root, "extension");
 const version = JSON.parse(fs.readFileSync(path.join(extension, "manifest.json"), "utf8")).version;
 const names = [
-  "shared/locales.js", "shared/i18n.js", "_locales/en/messages.json", "_locales/zh_CN/messages.json", "README.en.md",
+  "shared/locales.js", "shared/i18n.js", "_locales/en/messages.json", "_locales/zh_CN/messages.json",
   "manifest.json", "shared/ics.js", "shared/offline.js",
   "sites/tss/capture.js", "sites/tss/parser.js", "sites/tss/plan.js", "sites/tss/week-view.js", "sites/tss/content.js",
-  "popup/popup.html", "popup/popup.js", "README.md", "PRIVACY.md",
+  "popup/popup.html", "popup/popup.js", "PRIVACY.md",
   "icons/icon.svg", "icons/icon-16.png", "icons/icon-32.png", "icons/icon-48.png", "icons/icon-128.png"
 ];
 

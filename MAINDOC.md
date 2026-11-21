@@ -269,8 +269,7 @@ extension/
 │       ├── week-view.js     Full-screen timetable dialog
 │       └── content.js       Bottom-right panel, message handling, wiring
 ├── popup/                   Toolbar popup (popup.html, popup.js)
-├── README.md, README.en.md  Installation guide shipped in the ZIP
-└── PRIVACY.md               Privacy policy shipped in the ZIP
+└── PRIVACY.md               Privacy policy shipped in the ZIP (the install guide is the root README)
 ```
 
 Outside `extension/`: `scripts/` (locale build, packaging, optional UI check), `tests/`, `fixtures/`, `input/` (ignored) and `out/` (ignored build output).
@@ -318,7 +317,7 @@ All scripts listed in one `content_scripts` entry run as classic scripts in the 
 
 1. Create `extension/sites/<site>/` with its own capture, parser and content script. Capture must stay passive (§1.3), and the parser should emit the §4.1 event shape.
 2. Add `content_scripts` entries for the site's `matches`, listing the shared files the site needs. Each entry is injected independently.
-3. Widen `tests/manifest.test.cjs` deliberately. It currently asserts that every content script matches only `https://tss.ucsd.edu/*`, as a privacy guard. Update `extension/PRIVACY.md` (where the extension runs) and both extension READMEs in the same change.
+3. Widen `tests/manifest.test.cjs` deliberately. It currently asserts that every content script matches only `https://tss.ucsd.edu/*`, as a privacy guard. Update `extension/PRIVACY.md` (where the extension runs) and both root READMEs in the same change.
 4. Add the new files to the allowlist in `scripts/package.cjs` and the file count in `tests/package.test.cjs`.
 5. Extend `tests/modules.test.cjs`, which today checks only the first isolated-world entry, to load every entry.
 6. Add tests for the new parser, using fixtures.
@@ -337,7 +336,7 @@ There is no `background/` folder or service worker yet; an empty placeholder wou
 
 - `manifest.test.cjs`: permissions are exactly `["activeTab", "storage"]`; there are no `host_permissions`, no `background` and no `externally_connectable`; every content script matches only `https://tss.ucsd.edu/*`.
 - `capture.test.cjs`: only `EventListSet` rows are forwarded, other rows in a `$batch` are dropped, failed responses and other origins are ignored, and the page's request passes through unchanged.
-- `package.test.cjs`: the ZIPs contain exactly the 22 allowlisted files and nothing private (`input/`, `.DS_Store`, stray files).
+- `package.test.cjs`: the ZIPs contain exactly the 20 allowlisted files (including `PRIVACY.md`) and nothing private (`input/`, `.DS_Store`, stray files).
 - `offline.test.cjs`: offline HTML holds no TSS ids and cannot be broken out of with `</script>`.
 - `modules.test.cjs`: cross-module references resolve (§5.4).
 
@@ -490,8 +489,7 @@ Update all of these together in one commit:
 - `extension/manifest.json` → `version`. This is authoritative; `scripts/package.cjs` names the ZIPs from it.
 - `package.json` → `version`.
 - `extension/PRIVACY.md`, first line (version and date).
-- `extension/README.md` and `extension/README.en.md` (title and ZIP names).
-- The root `README.md` and `README.zh-CN.md`.
+- The root `README.md` and `README.zh-CN.md` ("Current version").
 
 Tag releases as `vX.Y.Z`.
 
@@ -524,7 +522,7 @@ As of 2026-11-21:
 
 Release procedure:
 
-1. On the commit being released, run `npm test` (all pass), then `npm run package`. This writes `out/tritoncal-extension-preview-<version>.zip` (files under an `extension/` folder) and `out/tritoncal-store-candidate-<version>.zip` (manifest at the root), each with 22 allowlisted files.
+1. On the commit being released, run `npm test` (all pass), then `npm run package`. This writes `out/tritoncal-extension-preview-<version>.zip` (files under an `extension/` folder) and `out/tritoncal-store-candidate-<version>.zip` (manifest at the root), each with 20 allowlisted files.
 2. Create tag `v<version>` and release title `TritonCal <version>`. Attach **only** the preview ZIP. The release notes contain the changes, the four-step install and the privacy link.
 3. Check the tag, the attachment, and the links in both READMEs. Update this section.
 
@@ -561,4 +559,4 @@ Store listing draft, kept for later (Chinese):
 | 2026-10-23 | IpoKlay | Decided against paying for the Chrome Web Store; GitHub Releases is the download. | `b58195b` |
 | 2026-10-25 | IpoKlay | 0.6.0: Issue #3 as six commits (`53f195a` hour labels, `dfbb573` rounded panel, `c5dbb59` popup, `07670d5` colours, `18c801b` typical week / Final, `0a11a53` bilingual), version bump `01ae4a5`, release docs `bf6b4d7` / `4df3ae0`. Opened PR #6. | PR #6 |
 | 2026-10-26 | Daniel Chen | Merged PR #6. | `65ce62a` |
-| 2026-11-21 | Nya~ | Decided that the extension will expand to other sites (Canvas, podcast and others) and integrate a backend. Asked for a multi-site layout, a written versioning scheme, all docs in one English MAINDOC with git-name attribution, an English AGENTS.md as the only agent entry point (CLAUDE.md removed), and English-first READMEs. Chose to skip v0.6.0 and release v0.7.0 next. Code and docs written by Claude Opus 5.5. | `f7445c9`, `103d569` and the follow-up commit removing `CLAUDE.md` |
+| 2026-11-21 | Nya~ | Decided that the extension will expand to other sites (Canvas, podcast and others) and integrate a backend. Asked for a multi-site layout, a written versioning scheme, all docs in one English MAINDOC with git-name attribution, an English AGENTS.md as the only agent entry point (CLAUDE.md removed; tool-specific entry files git-ignored), and English-first READMEs, with the in-ZIP `extension/README*` guides merged into the root READMEs (release ZIP 22 → 20 files). Chose to skip v0.6.0 and release v0.7.0 next. Code and docs written by Claude Opus 5.5. | `f7445c9`, `103d569` and the follow-up commits that day |

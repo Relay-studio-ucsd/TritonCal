@@ -3,6 +3,19 @@ input/*
 !input/.gitkeep
 *.har
 
+# AI 工具各自的入口/指令文件：AGENTS.md 是唯一入口，这些文件即使在本地生成也不提交
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+GEMINI.md
+.gemini/
+.cursorrules
+.cursor/
+.windsurfrules
+.clinerules
+.github/copilot-instructions.md
+.github/instructions/
+
 # 生成物
 out/
 dist/
