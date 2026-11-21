@@ -1,6 +1,6 @@
 # TritonCal — Main Documentation
 
-All technical documentation for TritonCal lives in this file (rule: [AGENTS.md](AGENTS.md)). The only other Markdown files are the READMEs, `extension/PRIVACY.md`, and the agent entry files `AGENTS.md` and `CLAUDE.md`. Open questions belong in [GitHub Issues](https://github.com/Relay-studio-ucsd/TritonCal/issues), not here.
+All technical documentation for TritonCal lives in this file (rule: [AGENTS.md](AGENTS.md)). The only other Markdown files are `AGENTS.md` (the single entry point for every AI agent; tool-specific files such as `CLAUDE.md` are not allowed), the READMEs and `extension/PRIVACY.md`. The READMEs and PRIVACY.md are kept separate from this file but are updated whenever what they say changes. Open questions belong in [GitHub Issues](https://github.com/Relay-studio-ucsd/TritonCal/issues), not here.
 
 **Authorship.** Work is credited to the git name that committed or submitted it; see §11 for how the history was attributed. This file was consolidated on 2026-11-21, at Nya~'s request, from the former `docs/01`–`docs/07`, `CLAUDE.md` and `fixtures/README.md` (last versions at commit `65ce62a`). The text was written by Claude Opus 5.5 and checked against the code and `git log`.
 
@@ -520,7 +520,7 @@ Versions marked "no" were local iterations recorded in the project log. Their wo
 As of 2026-11-21:
 
 - 0.6.0 was merged to `main` through PR #6 (`65ce62a`, 2026-10-26) but **never released**. There is no GitHub Release or tag.
-- `main` is now 0.7.0. **Decision needed:** either release v0.6.0 by tagging `65ce62a`, or skip straight to v0.7.0 from `main`. Users get the same features either way; 0.7.0 differs only in file layout and one added test.
+- Decided by Nya~ on 2026-11-21: v0.6.0 will not be released. The next release is **v0.7.0** from `main`. It has the same features as 0.6.0; only the file layout changed and one test was added.
 
 Release procedure:
 
@@ -561,4 +561,4 @@ Store listing draft, kept for later (Chinese):
 | 2026-10-23 | IpoKlay | Decided against paying for the Chrome Web Store; GitHub Releases is the download. | `b58195b` |
 | 2026-10-25 | IpoKlay | 0.6.0: Issue #3 as six commits (`53f195a` hour labels, `dfbb573` rounded panel, `c5dbb59` popup, `07670d5` colours, `18c801b` typical week / Final, `0a11a53` bilingual), version bump `01ae4a5`, release docs `bf6b4d7` / `4df3ae0`. Opened PR #6. | PR #6 |
 | 2026-10-26 | Daniel Chen | Merged PR #6. | `65ce62a` |
-| 2026-11-21 | Nya~ | Decided that the extension will expand to other sites (Canvas, podcast and others) and integrate a backend; asked for a multi-site layout, a written versioning scheme, all docs in one English MAINDOC with git-name attribution, an English AGENTS.md, and English-first READMEs. Restructure to 0.7.0 (`f7445c9`), written by Claude Opus 5.5. | `f7445c9`; this commit |
+| 2026-11-21 | Nya~ | Decided that the extension will expand to other sites (Canvas, podcast and others) and integrate a backend. Asked for a multi-site layout, a written versioning scheme, all docs in one English MAINDOC with git-name attribution, an English AGENTS.md as the only agent entry point (CLAUDE.md removed), and English-first READMEs. Chose to skip v0.6.0 and release v0.7.0 next. Code and docs written by Claude Opus 5.5. | `f7445c9`, `103d569` and the follow-up commit removing `CLAUDE.md` |
