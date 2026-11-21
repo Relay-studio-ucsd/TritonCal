@@ -5,11 +5,10 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const context = vm.createContext({ Date, Intl, Math, String, Number, Set });
-for (const file of ["parser.js", "week-view.js"]) {
+for (const file of ["sites/tss/parser.js", "sites/tss/plan.js", "sites/tss/week-view.js"]) {
   vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension", file), "utf8"), context);
 }
-const { planWeek } = context.TritonCalWeekView;
-const { planTypicalWeek, planFinal } = context.TritonCalWeekView;
+const { planWeek, planTypicalWeek, planFinal } = context.TritonCalPlan;
 
 function event(date, start, end, name = "TEST-001-LE (001-000)") {
   return { date, start, end, name, code: "TEST-001" };

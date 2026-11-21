@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-const source = fs.readFileSync(path.join(__dirname, "../extension/capture.js"), "utf8");
+const source = fs.readFileSync(path.join(__dirname, "../extension/sites/tss/capture.js"), "utf8");
 const origin = "https://tss.ucsd.edu";
 
 function runCapture({ url, body, ok = true }) {

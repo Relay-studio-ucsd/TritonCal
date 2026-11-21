@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-const source = fs.readFileSync(path.join(__dirname, "../extension/parser.js"), "utf8");
+const source = fs.readFileSync(path.join(__dirname, "../extension/sites/tss/parser.js"), "utf8");
 const context = vm.createContext({ Date, Intl, JSON, Number, String, Set });
 vm.runInContext(source, context);
 const parser = context.TritonCalParser;

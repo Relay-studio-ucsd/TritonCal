@@ -40,7 +40,7 @@
       panelBody.append(make("p", t("waitingTss")));
       return;
     }
-    const plan = globalThis.TritonCalWeekView.planTypicalWeek(latest.events);
+    const plan = globalThis.TritonCalPlan.planTypicalWeek(latest.events);
     toggle.textContent = t("scheduleCount", plan.count);
     panelBody.append(make("p", t("panelCount", plan.count, latest.events.length), "muted"));
     if (!plan.count) {

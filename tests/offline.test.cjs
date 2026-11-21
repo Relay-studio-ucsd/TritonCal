@@ -6,9 +6,9 @@ const vm = require("node:vm");
 
 const { chromeFor } = require("./helpers/i18n.cjs");
 const context = vm.createContext({ JSON, chrome: chromeFor() });
-vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/locales.js"), "utf8"), context);
-vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/i18n.js"), "utf8"), context);
-vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/offline.js"), "utf8"), context);
+vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/shared/locales.js"), "utf8"), context);
+vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/shared/i18n.js"), "utf8"), context);
+vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/shared/offline.js"), "utf8"), context);
 const { generateOfflineHtml } = context.TritonCalOffline;
 
 test("离线课表只带显示字段，独立打开不需网络资源", () => {

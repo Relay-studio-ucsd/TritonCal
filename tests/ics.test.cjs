@@ -5,7 +5,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const context = vm.createContext({ Date, Math, String, Number, Set, TextEncoder });
-vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/ics.js"), "utf8"), context);
+vm.runInContext(fs.readFileSync(path.join(__dirname, "../extension/shared/ics.js"), "utf8"), context);
 const { escapeText, foldLine, generateCalendar } = context.TritonCalIcs;
 
 function event(date, start, end, id = "100") {

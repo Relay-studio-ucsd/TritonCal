@@ -8,12 +8,12 @@ const root = path.join(__dirname, "../extension");
 
 function createI18n(chrome) {
   const context = vm.createContext({ chrome, Intl, Date });
-  for (const file of ["locales.js", "i18n.js"]) vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context);
+  for (const file of ["shared/locales.js", "shared/i18n.js"]) vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context);
   return context.TritonCalI18n;
 }
 
 test("bundled translations match the source catalogs", () => {
-  assert.equal(fs.readFileSync(path.join(root, "locales.js"), "utf8"), require("../scripts/build-locales.cjs").buildLocales());
+  assert.equal(fs.readFileSync(path.join(root, "shared/locales.js"), "utf8"), require("../scripts/build-locales.cjs").buildLocales());
 });
 
 test("manual language overrides browser locale, synchronizes views and persists", async () => {
@@ -87,15 +87,15 @@ test("manifest messages resolve and the helper loads before consumers", () => {
     const key = value.match(/^__MSG_(\w+)__$/)[1];
     for (const locale of ["en-US", "zh-CN"]) assert.ok(getMessage(catalogFor(locale), key));
   }
-  assert.deepEqual(manifest.content_scripts.find(script => script.world !== "MAIN").js.slice(0, 2), ["locales.js", "i18n.js"]);
-  const popup = fs.readFileSync(path.join(root, "popup.html"), "utf8");
-  assert.ok(popup.indexOf('src="i18n.js"') < popup.indexOf('src="popup.js"'));
+  assert.deepEqual(manifest.content_scripts.find(script => script.world !== "MAIN").js.slice(0, 2), ["shared/locales.js", "shared/i18n.js"]);
+  const popup = fs.readFileSync(path.join(root, "popup/popup.html"), "utf8");
+  assert.ok(popup.indexOf('src="../shared/i18n.js"') < popup.indexOf('src="popup.js"'));
 });
 
 for (const locale of ["en-US", "zh-CN"]) {
   test(`${locale}: dates stay on the requested day and offline output embeds its language`, async () => {
     const context = vm.createContext({ chrome: chromeFor(locale), Intl, Date });
-    for (const file of ["locales.js", "i18n.js", "offline.js"]) vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context);
+    for (const file of ["shared/locales.js", "shared/i18n.js", "shared/offline.js"]) vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context);
     await context.TritonCalI18n.ready;
     assert.equal(context.TritonCalI18n.date("2026-12-07", { weekday: "short" }), locale === "en-US" ? "Mon" : "周一");
     assert.equal(context.TritonCalI18n.t("scheduleCount", 13), locale === "en-US" ? "Schedule · 13" : "课表 · 13");

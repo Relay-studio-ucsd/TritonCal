@@ -7,10 +7,10 @@ const { chromium } = require("playwright");
 const { catalogFor, getMessage } = require("../tests/helpers/i18n.cjs");
 const root = path.join(__dirname, "..");
 const fixture = JSON.parse(fs.readFileSync(path.join(root, "fixtures/term-events.json"), "utf8"));
-const scripts = ["locales.js", "i18n.js", "parser.js", "ics.js", "offline.js", "week-view.js", "content.js"];
+const scripts = JSON.parse(fs.readFileSync(path.join(root, "extension/manifest.json"), "utf8")).content_scripts.find(script => script.world !== "MAIN").js;
 const server = http.createServer((req, res) => {
   const file = req.url.split("?")[0].slice(1);
-  if (scripts.includes(file) || ["popup.html", "popup.js"].includes(file)) {
+  if (scripts.includes(file) || ["popup/popup.html", "popup/popup.js"].includes(file)) {
     res.setHeader("Content-Type", file.endsWith("js") ? "text/javascript" : "text/html");
     res.end(fs.readFileSync(path.join(root, "extension", file)));
   } else {
@@ -142,7 +142,7 @@ const server = http.createServer((req, res) => {
     const otherLocale = locale === "en-US" ? "zh-CN" : "en-US";
     const otherT = (key, ...values) => getMessage(catalogFor(otherLocale), key, values);
     const languagePopup = await context.newPage();
-    await languagePopup.goto(`${origin}/popup.html?tab=https://example.com`);
+    await languagePopup.goto(`${origin}/popup/popup.html?tab=https://example.com`);
     await languagePopup.getByRole("button", { name: t("switchLanguage"), exact: true }).waitFor();
     await view.locator(".language-switch").click();
     await view.getByRole("button", { name: otherT("typical"), exact: true }).waitFor();
@@ -167,7 +167,7 @@ const server = http.createServer((req, res) => {
     await page.screenshot({ path: path.join(output, "narrow.png") });
     // 弹窗覆盖成功、等待数据、非 TSS 与连接失败四条用户路径。
     const popup = await context.newPage();
-    await popup.goto(`${origin}/popup.html`);
+    await popup.goto(`${origin}/popup/popup.html`);
     await popup.getByRole("button", { name: t("openWeek") }).click();
     assert.deepEqual(await popup.evaluate(() => window.__messages), [{ type: "tritoncal:open-week-view" }]);
     assert.equal(await popup.evaluate(() => window.__closed), true);
@@ -177,10 +177,10 @@ const server = http.createServer((req, res) => {
     assert.equal(await popup.locator("#status").textContent(), t("waitingRetry"));
     await popup.screenshot({ path: path.join(output, "popup.png") });
     assert.equal(await popup.evaluate(() => Boolean(window.__closed)), false);
-    await popup.goto(`${origin}/popup.html?tab=https://example.com`);
+    await popup.goto(`${origin}/popup/popup.html?tab=https://example.com`);
     assert.equal(await popup.locator("#open-week").isVisible(), false);
     assert.equal(await popup.locator("#status").textContent(), t("openTss"));
-    await popup.goto(`${origin}/popup.html`);
+    await popup.goto(`${origin}/popup/popup.html`);
     await popup.evaluate(() => { chrome.tabs.sendMessage = async () => { throw Error("No receiver"); }; });
     await popup.getByRole("button", { name: t("openWeek") }).click();
     assert.equal(await popup.locator("#status").textContent(), t("openError"));

@@ -20,7 +20,7 @@ test("打包白名单排除私人数据，ZIP 清单与扩展版本一致", () =
       const zip = fs.readFileSync(path.join(temp, "out", `tritoncal-${kind}-${version}.zip`));
       const end = zip.subarray(-22);
       assert.equal(end.readUInt32LE(0), 0x06054b50);
-      assert.equal(end.readUInt16LE(10), 21);
+      assert.equal(end.readUInt16LE(10), 22);
       let cursor = end.readUInt32LE(16);
       const names = [];
       while (cursor < zip.length - 22) {
@@ -35,8 +35,8 @@ test("打包白名单排除私人数据，ZIP 清单与扩展版本一致", () =
         names.push(name);
         cursor += 46 + length;
       }
-      assert.equal(names.length, 21);
-      for (const name of ["locales.js", "i18n.js", "_locales/en/messages.json", "_locales/zh_CN/messages.json", "README.en.md"]) {
+      assert.equal(names.length, 22);
+      for (const name of ["shared/locales.js", "shared/i18n.js", "sites/tss/plan.js", "_locales/en/messages.json", "_locales/zh_CN/messages.json", "README.en.md"]) {
         assert.ok(names.includes(prefix + name));
       }
       assert.ok(names.includes(`${prefix}manifest.json`));
