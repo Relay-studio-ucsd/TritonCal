@@ -4,7 +4,7 @@ English | [简体中文](README.zh-CN.md)
 
 TritonCal is a desktop browser extension for Chrome and Arc. It takes the classes the UCSD TSS home page has already loaded and shows them as a typical week and a finals view, with full course codes, titles, times and rooms. It can export a calendar file (.ics) or a standalone offline HTML timetable. TritonCal is an independent student project, not affiliated with or endorsed by UC San Diego.
 
-Current version: **0.7.0**. Downloads are published on [GitHub Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases); the first release is still being prepared. Chrome Web Store publication is deferred because developer registration requires a fee, so the extension is loaded manually.
+Latest release: **v0.6.0**, on [GitHub Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases). The code on `main` is 0.7.0: the same features with a reorganized file layout, not yet released. Chrome Web Store publication is deferred because developer registration requires a fee, so the extension is loaded manually.
 
 ## Install
 
@@ -67,7 +67,7 @@ Never send account names, passwords, student IDs or raw TSS responses. If you ch
 
 ## Data and limitations
 
-The extension only observes schedule responses TSS has already received. It never starts, replays or polls TSS requests, never automates the page, and never handles login details. It has no server, analytics or online translation. Schedule data stays in page memory. Only the single-colour choice (in TSS's local storage) and the language choice (in the extension's own storage) are saved. Exported files contain your timetable, so keep them private. Details: [privacy policy (Chinese)](extension/PRIVACY.md).
+The extension only observes schedule responses TSS has already received. It never starts, replays or polls TSS requests, never automates the page, and never handles login details. It has no server, analytics or online translation. Schedule data stays in page memory. Only the single-colour choice (in TSS's local storage) and the language choice (in the extension's own storage) are saved. Exported files contain your timetable, so keep them private. Details: [privacy policy](extension/PRIVACY.md).
 
 - Rooms appear only when TSS fills in `Room`. The `Location` field can be just the campus name, so it is never shown as a room.
 - If TSS loads incomplete data, the timetable is incomplete too. A slot appears in the typical week only if it occurs in at least half of the loaded weeks, rounded up. Slots are grouped by course code, type, section, weekday, start and end time, and room. Exams are left out. There is no term filter yet.

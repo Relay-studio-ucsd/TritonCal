@@ -1,37 +1,37 @@
-# TritonCal 隐私说明
+# TritonCal Privacy Policy
 
-适用于 0.7.0 预览版，更新日期：2026-11-21。
+Applies to the 0.7.0 preview. Last updated: 2026-11-21.
 
-TritonCal 是独立学生项目，与 UC San Diego 官方没有隶属或背书关系。
+TritonCal is an independent student project. It is not affiliated with or endorsed by UC San Diego.
 
-## 在哪里运行
+## Where it runs
 
-插件只在 `https://tss.ucsd.edu/*` 页面自动运行。你自行登录 TSS；插件不读取登录表单、密码、Cookie 或浏览历史。
+The extension runs automatically only on `https://tss.ucsd.edu/*` pages. You sign in to TSS yourself; the extension does not read login forms, passwords, cookies or browsing history.
 
-## 处理哪些信息
+## What information it processes
 
-插件被动观察当前页面自己收到的课表响应，解析日期、起止时间、课程代码与名称、教学类型、教室、考试标记以及用于识别课程的事件/模块编号。
+The extension passively observes the schedule responses the current page receives on its own. From them it parses dates, start and end times, course codes and names, teaching types, rooms, exam flags, and the event and module numbers that identify each course.
 
-若课表与其他响应一起放在 OData 批量响应中，插件会在当前页面内临时检查该响应，只转交课表记录，丢弃其他记录。插件不会另行请求、重放或轮询 TSS 接口。
+If the schedule arrives together with other responses in an OData batch response, the extension temporarily inspects that response within the current page, passes on only the schedule records and discards the rest. The extension never makes its own requests to TSS, and never replays or polls TSS endpoints.
 
-## 保存和传输
+## Storage and transfer
 
-插件不设服务器、统计服务、广告或远程代码；不会把课表发送给开发者或第三方。解析后的课表只保留在当前页面内存中；刷新或关闭该页面后需由 TSS 页面重新加载。插件没有后台同步或持久化课表存储。
+The extension has no server, analytics, advertising or remote code, and never sends your schedule to the developers or any third party. The parsed schedule is kept only in the current page's memory; after the page is refreshed or closed, the TSS page has to load it again. The extension has no background sync and no persistent schedule storage.
 
-颜色偏好保存在本地：所选单色值存于 `tss.ucsd.edu` 域的 `localStorage`（键 `tritoncal:mono-color`），刷新后仍可使用，不包含课表或身份信息。清除该站点本地数据可删除此偏好；移除插件不会自动清除此值。
+Your colour preference is stored locally: the chosen single colour is saved in the `localStorage` of the `tss.ucsd.edu` site (key `tritoncal:mono-color`), so it survives a refresh. It contains no schedule or identity information. Clearing that site's local data deletes this preference; removing the extension does not clear it automatically.
 
-中英文翻译随插件一同打包，不调用在线翻译服务。插件保存用户选择的语言（en 或 zh_CN），位于扩展自身 chrome.storage.local 的 tritoncal:language 键，不包含课程或身份信息，不使用云同步。移除插件会删除这个语言偏好。离线 HTML 包含下载时的翻译和语言设置，打开时无需访问网络。
+The English and Chinese translations are bundled with the extension; no online translation service is used. The extension saves the language you choose (`en` or `zh_CN`) in its own `chrome.storage.local`, under the key `tritoncal:language`. This contains no course or identity information and does not use cloud sync. Removing the extension deletes this language preference. Offline HTML files contain the translations and language setting from the time of download, and need no network access when opened.
 
-点击导出时，浏览器会在本地下载文件。ICS 包含课程日期、时间、名称和教室；离线 HTML 还包含显示课表所需的课程类型等信息，不包含原始响应或 TSS 事件/模块编号。下载文件会留在设备上，直到你自行删除。你主动传送文件或导入外部日历后，该服务会按其自身规则处理文件中的课表信息。
+When you click export, the browser downloads a file locally. ICS files contain course dates, times, names and rooms. Offline HTML files also contain the information needed to display the timetable, such as course types, but not raw responses or TSS event or module numbers. Downloaded files stay on your device until you delete them. If you send a file to someone or import it into an external calendar, that service handles the schedule information in the file under its own rules.
 
-## 浏览器权限
+## Browser permissions
 
-- 站点匹配 `https://tss.ucsd.edu/*`：让页面脚本在 TSS 内观察已收到的课表，并显示周课表。
-- `storage`：只保存语言偏好，让弹窗与页面内课表共享选择。
-- `activeTab`：点击插件图标时，检查当前标签页是否为 TSS，并向该标签页发送打开周视图的消息。
+- Site match `https://tss.ucsd.edu/*`: lets the page scripts observe the schedule TSS has received and show the weekly timetable.
+- `storage`: saves only the language preference, so the popup and the in-page timetable share the same choice.
+- `activeTab`: when you click the extension icon, checks whether the current tab is TSS and sends that tab the message to open the week view.
 
-## 删除和反馈
+## Removal and feedback
 
-在扩展管理页移除 TritonCal，然后刷新或关闭 TSS 标签页即可停止插件运行；已下载的文件需自行删除。
+To stop the extension, remove TritonCal on the browser's extensions page, then refresh or close the TSS tab. Delete any downloaded files yourself.
 
-试用反馈由分发此版本的人接收。反馈安装结果、浏览器名称和问题描述即可；无需发送账号、密码、学号或原始接口响应。
+Feedback from testers goes to whoever distributed this version to you. Reporting the install result, your browser name and a description of the problem is enough; you never need to send account names, passwords, student IDs or raw TSS responses.

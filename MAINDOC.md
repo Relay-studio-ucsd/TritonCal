@@ -26,7 +26,7 @@ All technical documentation for TritonCal lives in this file (rule: [AGENTS.md](
 
 TritonCal is a Chrome Manifest V3 browser extension (used in Chrome and Arc on desktop). It passively reads the courses a UCSD student has booked in **TSS** (Triton Student System, `tss.ucsd.edu`), shows them as a weekly timetable inside the TSS page, and exports an ICS calendar file or a standalone offline HTML timetable. It is an independent student project, not affiliated with or endorsed by UC San Diego.
 
-Current state: version **0.7.0** on `main`. No GitHub Release has been published yet (§10).
+Current state: version **0.7.0** on `main`, not yet released. The latest GitHub Release is **v0.6.0** (§10).
 
 ### 1.2 Planned scope
 
@@ -40,7 +40,7 @@ The backend plan reverses a non-goal from the original roadmap: "no backend, no 
 ### 1.3 Hard rules (non-negotiable)
 
 - **Passive capture only.** Read only data the TSS page has already loaded. Never send requests to `tss.ucsd.edu`, never replay or poll, never automate clicks, never touch login or passwords. Seen from the server, a TritonCal user's traffic must be identical to any other student's.
-- **Privacy.** Real captures go in `input/`, which is git-ignored because they contain student IDs and booking GUIDs. Never commit them, and never paste raw responses into docs or code comments. Use the fake data in `fixtures/` for examples.
+- **Privacy.** Real captures go in `input/`, which is git-ignored because they contain student IDs and booking GUIDs. The folder is not in the repository; create it locally when you need it. Never commit them, and never paste raw responses into docs or code comments. Use the fake data in `fixtures/` for examples.
 - **Zero dependencies.** Use Node ≥ 20 built-ins and plain static files. No frameworks, bundlers or npm dependencies. (The optional UI check `scripts/check-ui.cjs` uses an externally installed Playwright; nothing is added to `package.json`.)
 - **Real data over guesses.** Trust only fields marked verified in §2. Anything else must be confirmed against a real captured response before parsing code is written for it.
 - **Ask about look and feel; don't guess.** UI direction is settled with the maintainers first; decisions so far are in §6.2.
@@ -173,7 +173,7 @@ After installing the extension, the user must **fully reload** the TSS home page
 5. Open it → **Response**, and save the text as `input/timetable.json`. A `$batch` response is multipart text; save it whole.
 6. Alternatively, right-click the request list → **Save all as HAR with content** → `input/tss.har`. HAR is JSON, with each response body in `content.text`.
 
-Everything under `input/` (and any `*.har`) is git-ignored. Re-check field names against a fresh capture before relying on them, since TSS may change.
+Everything under `input/` (and any `*.har`) is git-ignored. The folder is not in the repository, so create it before saving. Re-check field names against a fresh capture before relying on them, since TSS may change.
 
 `$batch` response shape:
 
@@ -272,7 +272,7 @@ extension/
 └── PRIVACY.md               Privacy policy shipped in the ZIP (the install guide is the root README)
 ```
 
-Outside `extension/`: `scripts/` (locale build, packaging, optional UI check), `tests/`, `fixtures/`, `input/` (ignored) and `out/` (ignored build output).
+Outside `extension/`: `scripts/` (locale build, packaging, optional UI check), `tests/`, `fixtures/`, `input/` (created locally for real captures only, ignored, not in the repository) and `out/` (ignored build output).
 
 ### 5.2 Modules
 
@@ -491,7 +491,7 @@ Update all of these together in one commit:
 - `extension/manifest.json` → `version`. This is authoritative; `scripts/package.cjs` names the ZIPs from it.
 - `package.json` → `version`.
 - `extension/PRIVACY.md`, first line (version and date).
-- The root `README.md` and `README.zh-CN.md` ("Current version").
+- The root `README.md` and `README.zh-CN.md` (latest release, and the version on `main`).
 
 Tag releases as `vX.Y.Z`.
 
@@ -508,8 +508,8 @@ Tag releases as `vX.Y.Z`.
 | 0.5.3 | 2026-10-20 | no | Final uses the official finals periods | 31 |
 | 0.5.4 | 2026-10-20 | no | Bilingual UI following the browser language | 36 |
 | 0.5.5 | 2026-10-20 | no | In-extension language switch, default Chinese, `storage` permission | 40 |
-| 0.6.0 | 2026-10-25 | yes: `01ae4a5`, PR #6 → `65ce62a` | The 0.5.2–0.5.5 work rebuilt as six Issue #3 commits | 40 |
-| 0.7.0 | 2026-11-21 | yes: `f7445c9` | Multi-site layout (§5); no behaviour change | 41 |
+| 0.6.0 | 2026-10-25 | yes: `01ae4a5`, PR #6 → `65ce62a` | The 0.5.2–0.5.5 work rebuilt as six Issue #3 commits; released as v0.6.0 on 2026-11-21 | 40 |
+| 0.7.0 | 2026-11-21 | yes: `f7445c9` | Multi-site layout (§5); no behaviour change; not yet released | 42 |
 
 Versions marked "no" were local iterations recorded in the project log. Their work reached git through the 0.5.1 upload or the six 0.6.0 commits. The log mentions a local backup branch `codex/backup-local-0.5.5-2026-10-25` (`6886304`); it is not on `origin`.
 
@@ -519,8 +519,11 @@ Versions marked "no" were local iterations recorded in the project log. Their wo
 
 As of 2026-11-21:
 
-- 0.6.0 was merged to `main` through PR #6 (`65ce62a`, 2026-10-26) but **never released**. There is no GitHub Release or tag.
-- Decided by Nya~ on 2026-11-21: v0.6.0 will not be released. The next release is **v0.7.0** from `main`. It has the same features as 0.6.0; only the file layout changed and one test was added.
+- **v0.6.0 is released** ([release page](https://github.com/Relay-studio-ucsd/TritonCal/releases/tag/v0.6.0)), published by Nya~ on 2026-11-21.
+  - Tag `v0.6.0` points to `65ce62a`, the PR #6 merge and the last commit before the 0.7.0 restructure; the code is exactly as IpoKlay wrote it.
+  - It was built from that commit (40/40 tests pass). The only asset is `tritoncal-extension-preview-0.6.0.zip` (21 files, SHA-256 `d443ff652ca020798d11b5d83ad932d75bfb262e44e2d03ebb6f727dd292a039`), and its privacy link points to the `v0.6.0` copy of `PRIVACY.md`.
+  - PR #6 had no formal approving review (GitHub status `REVIEW_REQUIRED`). Daniel Chen commented "good" and merged it with admin rights.
+- `main` is 0.7.0 and not yet released. The next release is **v0.7.0** from `main`. It has the same features as 0.6.0; the file layout changed, two tests were added (`modules`, `agent-entry`), and the ZIP drops to 20 files.
 
 Release procedure:
 
@@ -561,4 +564,4 @@ Store listing draft, kept for later (Chinese):
 | 2026-10-23 | IpoKlay | Decided against paying for the Chrome Web Store; GitHub Releases is the download. | `b58195b` |
 | 2026-10-25 | IpoKlay | 0.6.0: Issue #3 as six commits (`53f195a` hour labels, `dfbb573` rounded panel, `c5dbb59` popup, `07670d5` colours, `18c801b` typical week / Final, `0a11a53` bilingual), version bump `01ae4a5`, release docs `bf6b4d7` / `4df3ae0`. Opened PR #6. | PR #6 |
 | 2026-10-26 | Daniel Chen | Merged PR #6. | `65ce62a` |
-| 2026-11-21 | Nya~ | Decided that the extension will expand to other sites (Canvas, podcast and others) and integrate a backend. Asked for a multi-site layout, a written versioning scheme, all docs in one English MAINDOC with git-name attribution, an English AGENTS.md as the only source of agent instructions (tool entry files such as `CLAUDE.md` allowed only as one-line pointers to it, enforced by a test; tool instruction folders git-ignored), and English-first READMEs, with the in-ZIP `extension/README*` guides merged into the root READMEs (release ZIP 22 → 20 files). Chose to skip v0.6.0 and release v0.7.0 next. Code and docs written by Claude Opus 5.5. | `f7445c9`, `103d569` and the follow-up commits that day |
+| 2026-11-21 | Nya~ | Decided that the extension will expand to other sites (Canvas, podcast and others) and integrate a backend. Asked for a multi-site layout, a written versioning scheme, all docs in one English MAINDOC with git-name attribution, an English AGENTS.md as the only source of agent instructions (tool entry files such as `CLAUDE.md` allowed only as one-line pointers to it, enforced by a test; tool instruction folders git-ignored), and English-first READMEs, with the in-ZIP `extension/README*` guides merged into the root READMEs (release ZIP 22 → 20 files). Removed the empty `input/` placeholder, since no code reads it. Published Release v0.6.0 from `65ce62a`; the next release is v0.7.0. Translated `extension/PRIVACY.md` into English from 0.7.0 on (v0.6.0 ships the Chinese original). Code and docs written by Claude Opus 5.5. | `f7445c9`, `103d569` and the follow-up commits that day |

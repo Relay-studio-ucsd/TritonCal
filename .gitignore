@@ -1,6 +1,5 @@
 # 真实抓取的 TSS 数据：含学号、booking GUID 等个人信息，永远不提交
-input/*
-!input/.gitkeep
+input/
 *.har
 
 # AI 工具的私有指令目录和个人文件：AGENTS.md 是唯一的指令来源，这些即使在本地生成也不提交。
