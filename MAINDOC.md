@@ -1,6 +1,6 @@
 # TritonCal — Main Documentation
 
-All technical documentation for TritonCal lives in this file (rule: [AGENTS.md](AGENTS.md)). The only other Markdown files are `AGENTS.md` (the single entry point for every AI agent; tool-specific files such as `CLAUDE.md` are not allowed), the READMEs and `extension/PRIVACY.md`. The READMEs and PRIVACY.md are kept separate from this file but are updated whenever what they say changes. Open questions belong in [GitHub Issues](https://github.com/Relay-studio-ucsd/TritonCal/issues), not here.
+All technical documentation for TritonCal lives in this file (rule: [AGENTS.md](AGENTS.md)). The only other Markdown files are `AGENTS.md` (the only source of instructions for AI agents), `CLAUDE.md` (a one-line `@AGENTS.md` pointer so Claude Code loads AGENTS.md automatically; tool entry files may contain nothing else), the READMEs and `extension/PRIVACY.md`. The READMEs and PRIVACY.md are kept separate from this file but are updated whenever what they say changes. Open questions belong in [GitHub Issues](https://github.com/Relay-studio-ucsd/TritonCal/issues), not here.
 
 **Authorship.** Work is credited to the git name that committed or submitted it; see §11 for how the history was attributed. This file was consolidated on 2026-11-21, at Nya~'s request, from the former `docs/01`–`docs/07`, `CLAUDE.md` and `fixtures/README.md` (last versions at commit `65ce62a`). The text was written by Claude Opus 5.5 and checked against the code and `git log`.
 
@@ -339,6 +339,7 @@ There is no `background/` folder or service worker yet; an empty placeholder wou
 - `package.test.cjs`: the ZIPs contain exactly the 20 allowlisted files (including `PRIVACY.md`) and nothing private (`input/`, `.DS_Store`, stray files).
 - `offline.test.cjs`: offline HTML holds no TSS ids and cannot be broken out of with `</script>`.
 - `modules.test.cjs`: cross-module references resolve (§5.4).
+- `agent-entry.test.cjs`: AI tool entry files (`CLAUDE.md` and similar) exist only at the allowed paths and contain only a one-line pointer to `AGENTS.md`.
 
 ---
 
@@ -462,8 +463,9 @@ Anonymize any real response before it becomes a fixture: replace GUIDs, student 
 | `manifest.test.cjs` | Permission and scope guards |
 | `package.test.cjs` | ZIP allowlist and contents |
 | `modules.test.cjs` | Load order and cross-module references |
+| `agent-entry.test.cjs` | AI tool entry files are one-line pointers to `AGENTS.md` |
 
-At 0.7.0: **41 tests, all passing.**
+At 0.7.0: **42 tests, all passing.**
 
 `scripts/check-ui.cjs` is an optional browser regression run. It uses a separately installed Playwright and local Chrome (path override: `TRITONCAL_CHROME`) to serve the extension files with fixture data and check both languages: panel scrolling, labels, full card text, the two views, colours, persistence, popup states and offline HTML. Screenshots go to `out/i18n/`. It never opens TSS. It is not part of `npm test`, and its results on macOS Chrome do not count as Windows or real-TSS acceptance.
 
@@ -559,4 +561,4 @@ Store listing draft, kept for later (Chinese):
 | 2026-10-23 | IpoKlay | Decided against paying for the Chrome Web Store; GitHub Releases is the download. | `b58195b` |
 | 2026-10-25 | IpoKlay | 0.6.0: Issue #3 as six commits (`53f195a` hour labels, `dfbb573` rounded panel, `c5dbb59` popup, `07670d5` colours, `18c801b` typical week / Final, `0a11a53` bilingual), version bump `01ae4a5`, release docs `bf6b4d7` / `4df3ae0`. Opened PR #6. | PR #6 |
 | 2026-10-26 | Daniel Chen | Merged PR #6. | `65ce62a` |
-| 2026-11-21 | Nya~ | Decided that the extension will expand to other sites (Canvas, podcast and others) and integrate a backend. Asked for a multi-site layout, a written versioning scheme, all docs in one English MAINDOC with git-name attribution, an English AGENTS.md as the only agent entry point (CLAUDE.md removed; tool-specific entry files git-ignored), and English-first READMEs, with the in-ZIP `extension/README*` guides merged into the root READMEs (release ZIP 22 → 20 files). Chose to skip v0.6.0 and release v0.7.0 next. Code and docs written by Claude Opus 5.5. | `f7445c9`, `103d569` and the follow-up commits that day |
+| 2026-11-21 | Nya~ | Decided that the extension will expand to other sites (Canvas, podcast and others) and integrate a backend. Asked for a multi-site layout, a written versioning scheme, all docs in one English MAINDOC with git-name attribution, an English AGENTS.md as the only source of agent instructions (tool entry files such as `CLAUDE.md` allowed only as one-line pointers to it, enforced by a test; tool instruction folders git-ignored), and English-first READMEs, with the in-ZIP `extension/README*` guides merged into the root READMEs (release ZIP 22 → 20 files). Chose to skip v0.6.0 and release v0.7.0 next. Code and docs written by Claude Opus 5.5. | `f7445c9`, `103d569` and the follow-up commits that day |

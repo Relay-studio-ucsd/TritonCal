@@ -3,17 +3,12 @@ input/*
 !input/.gitkeep
 *.har
 
-# AI 工具各自的入口/指令文件：AGENTS.md 是唯一入口，这些文件即使在本地生成也不提交
-CLAUDE.md
+# AI 工具的私有指令目录和个人文件：AGENTS.md 是唯一的指令来源，这些即使在本地生成也不提交。
+# 根目录的 CLAUDE.md 等入口文件可以提交，但只能是一行指向 AGENTS.md 的指针（tests/agent-entry.test.cjs 检查）。
 CLAUDE.local.md
 .claude/
-GEMINI.md
 .gemini/
-.cursorrules
 .cursor/
-.windsurfrules
-.clinerules
-.github/copilot-instructions.md
 .github/instructions/
 
 # 生成物
