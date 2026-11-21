@@ -1,22 +1,37 @@
-# TritonCal — UCSD TSS 周课表
+# TritonCal — UCSD TSS schedule viewer
 
-[English](README.en.md)
+English | [简体中文](README.zh-CN.md)
 
-TritonCal 是电脑端 Arc / Chrome 浏览器扩展。0.6.0 被动读取 TSS 页面已经收到的课程响应，显示典型周 / Final、时间和教室，支持配色与中英文切换，以及 ICS 和离线 HTML 导出。正式下载入口为 GitHub Release；Chrome 应用商店暂不上架。
+TritonCal is a desktop browser extension for Chrome and Arc. It takes the classes the UCSD TSS home page has already loaded and shows them as a typical week and a finals view, with full course codes, titles, times and rooms. It can export a calendar file (.ics) or a standalone offline HTML timetable. TritonCal is an independent student project, not affiliated with or endorsed by UC San Diego.
 
-## 安装与使用
+Current version: **0.7.0**. Downloads are published on [GitHub Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases); the first release is still being prepared. Chrome Web Store publication is deferred because developer registration requires a fee.
 
-1. 到本仓库 [Releases 页面](https://github.com/Relay-studio-ucsd/TritonCal/releases) 下载 `tritoncal-extension-preview-0.6.0.zip`，解压后得到 `extension` 文件夹。
-2. 打开 `chrome://extensions`，启用开发者模式。
-3. 选择“加载已解压的扩展程序”，选择解压得到的 `extension` 文件夹；里面应直接包含 `manifest.json`。
-4. 自己登录 TSS 首页并整页刷新。
-5. 点击页面右下角“课表”，再点“打开周视图”。
+## Install
 
-使用插件不需要 Node 或 npm。详细安装、更新、卸载和排错见 [插件说明](extension/README.md)，隐私规则见 [PRIVACY.md](extension/PRIVACY.md)。
+No programming tools are needed. Full guide: [extension/README.en.md](extension/README.en.md) (中文：[extension/README.md](extension/README.md)).
 
-## 开发、测试与打包
+1. Download `tritoncal-extension-preview-<version>.zip` from [Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases) and extract it to get the `extension` folder.
+2. Open `chrome://extensions` (Arc: `arc://extensions`), enable **Developer mode**, choose **Load unpacked**, and select the `extension` folder. It must directly contain `manifest.json`.
+3. Sign in to TSS yourself and fully reload its home page.
+4. Click **Schedule** at the bottom right, then **Open week view**. The interface starts in Chinese; click **English** to switch.
 
-开发需要 Node.js >= 20，不需要安装 npm 依赖。
+## Features
+
+- **Typical week** groups recurring class slots. **Final** shows the loaded events in the supported UCSD finals periods.
+- Colour by course or by one colour of your choice. Every card shows the full course title, time and room.
+- Switch between English and Simplified Chinese from the timetable, the schedule panel or the toolbar popup. The choice is saved and shared across the extension's views, independently of the browser language. Dates and weekdays follow it.
+- Offline HTML keeps the language used at download and works without the extension or an internet connection.
+- ICS files use fixed English labels such as Lecture and Exam, and keep course titles and room names exactly as TSS supplies them.
+
+## Data and limitations
+
+The extension only observes schedule responses TSS has already received. It never starts, replays or polls TSS requests, never automates the page, and never handles login details. It has no server, analytics or online translation. Schedule data stays in page memory; only your colour and language preferences are saved locally. Exported files contain your timetable, so keep them private. Details: [privacy policy (Chinese)](extension/PRIVACY.md).
+
+If TSS loads incomplete data, the timetable is incomplete too. A slot appears in the typical week only if it occurs in at least half of the loaded weeks, rounded up. Final covers Fall 2026, Winter 2027 and Spring 2027 using the [official UCSD calendar](https://blink.ucsd.edu/instructors/resources/academic/calendars/2026.html). Events in those periods without an exam flag are labelled "Finals-period event", so confirm them against Final Examination in the course details. For other terms, only explicitly flagged exams appear, and these may include midterms. An empty Final view does not mean you have no exams.
+
+The extension is built for desktop. Windows appearance and phone compatibility have not yet been tested on real devices. Exported files are snapshots and do not update.
+
+## Development
 
 ```sh
 git clone https://github.com/Relay-studio-ucsd/TritonCal.git
@@ -25,20 +40,6 @@ npm test
 npm run package
 ```
 
-等价的直接运行方式：
+Requires Node.js 20 or newer, with no npm dependencies. `npm test` runs `tests/`. `npm run package` regenerates the bundled translations and writes preview and store-candidate ZIPs to `out/` from an explicit file allowlist. The optional `scripts/check-ui.cjs` browser check uses a separately installed Playwright and Chrome with fake data; it never opens TSS.
 
-```sh
-node --test tests/*.test.cjs
-node scripts/build-locales.cjs
-node scripts/package.cjs
-```
-
-打包脚本只读取明确列出的插件发行文件，在 `out/` 生成分享包和商店候选包。分享包包含 `extension/` 文件夹，商店候选包根目录直接放 `manifest.json`。输出的 ZIP 不提交到源码仓库。
-
-## 数据与当前进度
-
-插件不主动请求 TSS、不参与登录、不自动点击，不上传课表；课程只保存在当前标签页内存中。真实抓取放在被忽略的 `input/`，测试使用虚构数据。安装包仅包含插件文件。
-
-当前版本为 **0.6.0**，安装包统一从 [GitHub Releases](https://github.com/Relay-studio-ucsd/TritonCal/releases) 下载。40 项自动测试及中英 Chrome 假数据界面回归通过；TSS 人工语言切换、Windows 和手机真机验收仍有待办。变更和验证范围见 [Issue #3 修复记录](docs/06-issue-3.md)。
-
-实际路线已经从最初的静态 HTML 计划转为只读 MV3 扩展，原因是用户优先希望直接在 TSS 中使用。背景、技术约束和发布条件见 [CLAUDE.md](CLAUDE.md)、[路线图](docs/04-roadmap.md) 和 [发布准备](docs/05-release.md)。
+All technical documentation (TSS interfaces, data model, architecture, decisions, versioning, release status and history) is in [MAINDOC.md](MAINDOC.md). AI agents start from [AGENTS.md](AGENTS.md). Keep personal captures in the ignored `input/` folder and build output in the ignored `out/` folder.
